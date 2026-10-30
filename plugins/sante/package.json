@@ -1,0 +1,16 @@
+{
+  "name": "capacitor-sante",
+  "version": "1.0.0",
+  "description": "Lecture seule des donnees de sante de l'appareil pour Fonte & Macros",
+  "license": "MIT",
+  "private": true,
+  "files": [
+    "ios/",
+    "CapacitorSante.podspec"
+  ],
+  "capacitor": {
+    "ios": {
+      "src": "ios"
+    }
+  }
+}

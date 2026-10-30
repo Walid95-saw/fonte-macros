@@ -1,9 +1,18 @@
+# Compile un IPA iOS non signe sur un runner macOS de GitHub.
+#
+# Pourquoi non signe : signer exige un compte Apple Developer, que seul le
+# proprietaire de l'appareil peut creer. L'IPA produit ici est resigne au moment
+# de l'installation par Sideloadly ou AltStore, avec un identifiant Apple gratuit.
+#
+# Les runners macOS sont gratuits sur un depot public. Sur un depot prive, ils
+# consomment les minutes offertes dix fois plus vite.
+
 name: IPA iOS
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:        # lancement a la main depuis l'onglet Actions
   push:
-    tags: ['v*']
+    tags: ['v*']            # ou automatiquement sur une etiquette de version
 
 jobs:
   construire:
@@ -20,6 +29,9 @@ jobs:
       - name: Dependances JavaScript
         run: npm install --no-audit --no-fund
 
+      # cap sync copie la page web et inscrit le greffon de sante dans le Podfile.
+      # Aucune modification du fichier projet Xcode n'est necessaire : le greffon
+      # est un pod local, declare dans plugins/sante.
       - name: Copier la page et cabler le greffon
         run: npx cap sync ios
 

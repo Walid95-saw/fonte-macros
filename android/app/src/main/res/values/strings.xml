@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Fonte &amp; Macros</string>
+    <string name="title_activity_main">Fonte &amp; Macros</string>
+    <string name="package_name">com.fontemacros.app</string>
+    <string name="custom_url_scheme">com.fontemacros.app</string>
+</resources>

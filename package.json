@@ -1,0 +1,13 @@
+{
+  "name": "fonte-macros",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Suivi nutrition et musculation, avec lecture des donnees de sante du telephone",
+  "dependencies": {
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/cli": "^6.2.0",
+    "@capacitor/core": "^6.2.0",
+    "@capacitor/ios": "^6.2.0",
+    "capacitor-sante": "file:plugins/sante"
+  }
+}

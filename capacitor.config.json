@@ -1,0 +1,11 @@
+{
+  "appId": "com.fontemacros.app",
+  "appName": "Fonte & Macros",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false
+  },
+  "server": {
+    "androidScheme": "https"
+  }
+}

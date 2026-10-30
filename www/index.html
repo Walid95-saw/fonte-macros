@@ -1,0 +1,2414 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<style>
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;font:14px system-ui,-apple-system,sans-serif}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+<script src="pont-sante.js"></script>
+</head>
+<body>
+<title>Fonte &amp; Macros</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout : bandeau collant + rail d'onglets, colonne unique 1060px, grilles de fiches qui se replient en une colonne a 400px. Bilingue FR / AR, bascule complete en RTL. */
+:root{
+  --bg:#E8EBEF; --surface:#FFFFFF; --surface-2:#F1F4F7; --line:#D2D8DF;
+  --fg:#161A20; --muted:#5A6572;
+  --accent:#9E4426; --accent-soft:#F4DFD7;
+  --steel:#2E6B77; --steel-soft:#DBEAEC;
+  --good:#3C7A4E; --warn:#9A6D16; --bad:#A33A33;
+  --prot:#2E6B77; --carb:#9E4426; --fat:#9A6D16;
+  --r:10px;
+  --ff-display:'Archivo','Helvetica Neue',Arial,sans-serif;
+  --ff-body:'IBM Plex Sans',system-ui,-apple-system,Segoe UI,sans-serif;
+  --ff-mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+  /* teintes par famille d'aliments */
+  --c-V:#B5562F; --c-P:#3E7D96; --c-L:#B08A2E; --c-F:#A8762F; --c-G:#6E8034;
+  --c-Z:#3F7C43; --c-R:#BC5F27; --c-N:#7E5730; --c-M:#B08F1C; --c-B:#44809B;
+  --c-S:#8A4166; --c-C:#52669A; --c-A:#9A5531;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11141A; --surface:#191E26; --surface-2:#212934; --line:#2E3742;
+    --fg:#E4E8EE; --muted:#8D98A7;
+    --accent:#D97B52; --accent-soft:#3B241B;
+    --steel:#5FAAB7; --steel-soft:#153035;
+    --good:#5FA874; --warn:#C9A14A; --bad:#D4746C;
+    --prot:#5FAAB7; --carb:#D97B52; --fat:#C9A14A;
+    --c-V:#E08560; --c-P:#6FB4CE; --c-L:#DCBA5F; --c-F:#D9A75F; --c-G:#A6BC63;
+    --c-Z:#6DB873; --c-R:#E5915A; --c-N:#BD8F5E; --c-M:#DCC14E; --c-B:#73B6D1;
+    --c-S:#C97BA5; --c-C:#8C9FD4; --c-A:#D08A60;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11141A; --surface:#191E26; --surface-2:#212934; --line:#2E3742;
+  --fg:#E4E8EE; --muted:#8D98A7;
+  --accent:#D97B52; --accent-soft:#3B241B;
+  --steel:#5FAAB7; --steel-soft:#153035;
+  --good:#5FA874; --warn:#C9A14A; --bad:#D4746C;
+  --prot:#5FAAB7; --carb:#D97B52; --fat:#C9A14A;
+  --c-V:#E08560; --c-P:#6FB4CE; --c-L:#DCBA5F; --c-F:#D9A75F; --c-G:#A6BC63;
+  --c-Z:#6DB873; --c-R:#E5915A; --c-N:#BD8F5E; --c-M:#DCC14E; --c-B:#73B6D1;
+  --c-S:#C97BA5; --c-C:#8C9FD4; --c-A:#D08A60;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--ff-body);font-size:15px;line-height:1.5;margin:0}
+body[dir="rtl"]{font-family:'IBM Plex Sans Arabic',var(--ff-body);line-height:1.75}
+body[dir="rtl"] h1,body[dir="rtl"] h2,body[dir="rtl"] h3,body[dir="rtl"] h4,body[dir="rtl"] .brand{font-family:'IBM Plex Sans Arabic',var(--ff-display)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--surface)}
+h1,h2,h3,h4{font-family:var(--ff-display);font-weight:700;margin:0;text-wrap:balance;letter-spacing:-.01em}
+.num{font-family:var(--ff-mono);font-variant-numeric:tabular-nums;direction:ltr;display:inline-block}
+button,input,select{font:inherit;color:inherit}
+
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--line)}
+.top-in{max-width:1060px;margin:0 auto;padding-block:12px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{font-family:var(--ff-display);font-weight:800;font-size:19px;letter-spacing:-.02em;direction:ltr}
+.brand i{font-style:normal;color:var(--accent)}
+.top-meta{margin-inline-start:auto;display:flex;gap:14px;align-items:center;color:var(--muted);font-size:13px;flex-wrap:wrap}
+.top-meta b{color:var(--fg);font-family:var(--ff-mono);font-weight:600}
+.lang{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.lang button{background:var(--surface-2);border:0;padding:5px 11px;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted)}
+.lang button[aria-pressed="true"]{background:var(--accent);color:#fff}
+.rail{background:var(--surface);border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.rail::-webkit-scrollbar{display:none}
+.rail-in{max-width:1060px;margin:0 auto;display:flex;gap:2px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.rail button{background:none;border:0;border-bottom:2px solid transparent;padding:11px 13px;cursor:pointer;
+  color:var(--muted);font-weight:500;white-space:nowrap;font-size:14px}
+.rail button:hover{color:var(--fg)}
+.rail button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+main{max-width:1060px;margin:0 auto;padding-block:22px 56px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.stack{display:flex;flex-direction:column;gap:16px}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+.eyebrow{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.lede{color:var(--muted);font-size:14px;max-width:62ch}
+.sep{height:1px;background:var(--line);border:0;margin:0}
+
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field label{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.02em}
+.field input,.field select,.inp{background:var(--surface-2);border:1px solid var(--line);border-radius:7px;padding:8px 10px;width:100%;min-width:0}
+.field input:focus-visible,.field select:focus-visible,.inp:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.hint{font-size:12px;color:var(--muted)}
+.btn{background:var(--accent);color:#fff;border:0;border-radius:7px;padding:9px 15px;font-weight:600;cursor:pointer}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:var(--surface-2);color:var(--fg);border:1px solid var(--line)}
+.btn.mini{padding:5px 9px;font-size:13px;border-radius:6px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+
+.kpi{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+.kpi .k{font-family:var(--ff-mono);font-size:27px;font-weight:600;letter-spacing:-.02em;line-height:1.1;direction:ltr}
+.kpi .u{font-size:13px;color:var(--muted);font-family:var(--ff-body);font-weight:400}
+.kpi .n{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.45}
+.kpi .x{font-size:12.5px;color:var(--muted);line-height:1.55;margin:10px 0 0;padding-top:10px;border-top:1px solid var(--line)}
+.kpi.hero .x{border-top-color:var(--accent);opacity:.85}
+.kpi.hero{background:var(--accent-soft);border-color:transparent}
+.kpi.hero .k{color:var(--accent);font-size:34px}
+
+.macro{display:grid;grid-template-columns:86px 1fr auto;gap:10px;align-items:center;padding:7px 0}
+.macro+.macro{border-top:1px solid var(--line)}
+.macro .nm{font-size:13px;font-weight:600}
+.bar{height:9px;border-radius:5px;background:var(--surface-2);overflow:hidden;border:1px solid var(--line)}
+.bar>span{display:block;height:100%;border-radius:4px}
+.macro .vl{font-family:var(--ff-mono);font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap;direction:ltr}
+.sw{width:9px;height:9px;border-radius:2px;display:inline-block;vertical-align:middle;margin-inline-end:5px}
+
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{text-align:start;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);
+  font-weight:600;padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap;background:var(--surface-2)}
+td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+td.n,th.n{text-align:end;font-family:var(--ff-mono);font-variant-numeric:tabular-nums;white-space:nowrap;direction:ltr}
+th.n{font-family:inherit}
+tbody tr:hover{background:var(--surface-2)}
+td.e,th.e{text-align:end}
+
+.chip{display:inline-block;font-size:11px;padding:2px 7px;border-radius:999px;background:var(--steel-soft);
+  color:var(--steel);font-weight:600;white-space:nowrap}
+.chip.a{background:var(--accent-soft);color:var(--accent)}
+.note{border-inline-start:3px solid var(--steel);background:var(--steel-soft);padding:10px 13px;border-radius:7px;font-size:13px}
+.note.warn{border:1px solid var(--line);border-inline-start:3px solid var(--warn);background:transparent}
+.empty{border:1px dashed var(--line);border-radius:var(--r);padding:26px 18px;text-align:center;color:var(--muted);font-size:14px}
+.empty strong{display:block;color:var(--fg);font-family:var(--ff-display);font-size:16px;margin-bottom:5px}
+
+/* --- vignettes d'aliments --- */
+.vig{width:38px;height:38px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line);
+  display:grid;place-items:center;flex:0 0 auto;overflow:hidden;position:relative}
+.vig svg{width:24px;height:24px}
+.vig img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;background:var(--surface-2)}
+.vig.s{width:30px;height:30px;border-radius:7px}
+.vig.s svg{width:19px;height:19px}
+.vig.xl{width:54px;height:54px;border-radius:11px}
+.vig.xl svg{width:33px;height:33px}
+.photo-btn{position:absolute;inset:auto 0 0 0;height:14px;background:var(--accent);color:#fff;border:0;
+  font-size:9px;line-height:14px;cursor:pointer;opacity:0;transition:opacity .15s;padding:0}
+.vig:hover .photo-btn,.vig:focus-within .photo-btn{opacity:1}
+
+.hits{max-height:340px;overflow-y:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+.hit{display:flex;gap:11px;align-items:center;padding:7px 12px;border:0;border-bottom:1px solid var(--line);
+  border-inline-start:3px solid transparent;cursor:pointer;background:none;width:100%;text-align:start}
+.hit:last-child{border-bottom:0}
+.hit:hover,.hit[aria-current="true"]{background:var(--surface-2)}
+.hit[aria-current="true"]{border-inline-start-color:var(--accent)}
+.hit .t{font-weight:500;font-size:14px}
+.hit .s{font-size:12px;color:var(--muted)}
+.hit .v{font-family:var(--ff-mono);font-size:12.5px;color:var(--muted);white-space:nowrap;margin-inline-start:auto;direction:ltr}
+.hit .v b{color:var(--fg)}
+.nom{display:flex;align-items:center;gap:10px}
+
+.meal h4{font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:6px}
+.del{background:none;border:0;color:var(--muted);cursor:pointer;padding:2px 6px;border-radius:5px;font-size:15px;line-height:1}
+.del:hover{color:var(--bad);background:var(--surface-2)}
+
+/* --- silhouettes animees des exercices --- */
+.mv{width:46px;height:46px;flex:0 0 auto;direction:ltr;overflow:visible}
+.mv.gr{width:170px;height:170px}
+.mv .co,.mv .br,.mv .tr{stroke:var(--fg);stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.mv .tr{stroke-width:11}
+.mv .br{stroke:var(--accent)}
+.mv .j2{stroke:var(--muted);stroke-width:4.4}
+.mv .tt{fill:var(--fg)}
+.mv .pl{fill:var(--accent);fill-opacity:.3;stroke:var(--accent);stroke-width:2.5}
+.mv .fx{stroke:var(--muted);stroke-width:3.4;fill:var(--muted);fill-opacity:.25;stroke-linecap:round}
+.mv .cb{stroke:var(--steel);stroke-width:2;stroke-dasharray:3 3}
+.mv .sol{stroke:var(--line);stroke-width:2.5;stroke-linecap:round}
+.exo{background:none;border:0;padding:0;color:inherit;font:inherit;text-align:start;cursor:pointer;
+  display:flex;align-items:center;gap:9px;width:100%;border-radius:6px}
+.exo:hover{color:var(--accent)}
+.exo .lp{width:9px;height:9px;border-radius:50%;border:2px solid var(--accent);flex:0 0 auto;opacity:.55}
+.exo:hover .lp{opacity:1;background:var(--accent)}
+.mvcard{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap}
+.mvcard .fig{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r);padding:8px;flex:0 0 auto}
+.mvcard .txt{flex:1 1 240px;min-width:0}
+@media (prefers-reduced-motion:reduce){.mv{animation:none}}
+svg.chart{direction:ltr}
+svg .ax{stroke:var(--line);stroke-width:1}
+svg .lbl{fill:var(--muted);font-size:11px;font-family:var(--ff-mono)}
+@media (prefers-reduced-motion:no-preference){.fade{animation:f .25s ease-out}}
+@keyframes f{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (max-width:520px){ .top-meta{width:100%;margin-inline-start:0} .kpi .k{font-size:24px} .kpi.hero .k{font-size:29px} }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-poultry" viewBox="0 0 24 24"><circle cx="14.6" cy="9" r="5.6"/><path fill="none" d="M10.7 12.9 8 15.6"/><circle cx="7" cy="17.3" r="2.7"/></symbol>
+<symbol id="i-meat" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="9" ry="6.4"/><ellipse cx="9.2" cy="11.4" rx="3.1" ry="2.2" fill="none"/></symbol>
+<symbol id="i-sausage" viewBox="0 0 24 24"><rect x="2.5" y="8.6" width="19" height="6.8" rx="3.4"/><path fill="none" d="M8 10.4v3.2M12 10.4v3.2M16 10.4v3.2"/></symbol>
+<symbol id="i-ham" viewBox="0 0 24 24"><path d="M3.5 7.5h11.5a4.5 4.5 0 0 1 0 9H3.5Z"/><circle cx="14.5" cy="12" r="1.8" fill="none"/></symbol>
+<symbol id="i-fish" viewBox="0 0 24 24"><path d="M2.2 12c2.7-3.7 6.3-5.4 9.5-5.4S17.9 8.6 19.3 12c-1.4 3.4-4.4 5.4-7.6 5.4S4.9 15.7 2.2 12Z"/><path fill="none" d="m19.3 12 2.5-2.9v5.8L19.3 12"/><circle cx="7.4" cy="11" r=".95" fill="currentColor" fill-opacity="1" stroke="none"/></symbol>
+<symbol id="i-shell" viewBox="0 0 24 24"><path d="M12 19.5 3.4 8.6A8.3 8.3 0 0 1 20.6 8.6Z"/><path fill="none" d="M12 19.5V5.1M7.6 6.5 9.9 17.3M16.4 6.5 14.1 17.3"/></symbol>
+<symbol id="i-can" viewBox="0 0 24 24"><rect x="5.4" y="3.6" width="13.2" height="16.8" rx="2"/><path fill="none" d="M5.4 8h13.2M5.4 16h13.2"/></symbol>
+<symbol id="i-egg" viewBox="0 0 24 24"><path d="M12 2.8c3.4 0 6.1 4.5 6.1 8.5A6.1 6.1 0 0 1 5.9 11.3C5.9 7.3 8.6 2.8 12 2.8Z"/><path fill="none" d="M9.1 12.6a2.9 2.9 0 0 0 2.9 2.9"/></symbol>
+<symbol id="i-milk" viewBox="0 0 24 24"><path d="M7 9.2h10V20H7Z"/><path fill="none" d="M7 9.2 9.6 4h4.8L17 9.2M7 13h10"/></symbol>
+<symbol id="i-yogurt" viewBox="0 0 24 24"><path d="M5.6 8.4h12.8l-1.3 10.8a1.7 1.7 0 0 1-1.7 1.5H8.6a1.7 1.7 0 0 1-1.7-1.5Z"/><rect x="4.4" y="4.8" width="15.2" height="3.6" rx="1.2"/></symbol>
+<symbol id="i-cheese" viewBox="0 0 24 24"><path d="M3.4 16.4V10l9.2-5 8 4.1v7.3a1 1 0 0 1-1 1h-15.2a1 1 0 0 1-1-1Z"/><circle cx="8" cy="13" r="1.4" fill="none"/><circle cx="14.2" cy="14.2" r="1.1" fill="none"/></symbol>
+<symbol id="i-butter" viewBox="0 0 24 24"><path d="M2.8 13.6 8 8.2h12a1 1 0 0 1 1 1v6.2a1 1 0 0 1-1 1H3.8a1 1 0 0 1-1-1Z"/><path fill="none" d="M8 8.2v5.4H2.8"/></symbol>
+<symbol id="i-rice" viewBox="0 0 24 24"><path d="M2.8 12h18.4a9.2 9.2 0 0 1-18.4 0Z"/><path fill="none" d="M7.6 9.2c.5-1 1.5-1.5 2.4-1M11.6 8.2c.5-1 1.5-1.5 2.4-1M14.6 9.6c.5-1 1.5-1.5 2.4-1"/></symbol>
+<symbol id="i-pasta" viewBox="0 0 24 24"><path d="M4.4 12.4h15.2v1.4a7.6 7.6 0 0 1-15.2 0Z"/><path fill="none" d="M7 12.4c0-3.4 2.2-5.6 5-5.6s5 2.2 5 5.6M9.6 7.4 10.4 12.4M14.4 7.4l-.8 5"/></symbol>
+<symbol id="i-bread" viewBox="0 0 24 24"><path d="M3.6 10a4.2 4.2 0 0 1 4.2-4.2h8.4A4.2 4.2 0 0 1 20.4 10v8.2a1 1 0 0 1-1 1H4.6a1 1 0 0 1-1-1Z"/><path fill="none" d="M8.2 5.8v13.4M15.8 5.8v13.4"/></symbol>
+<symbol id="i-oats" viewBox="0 0 24 24"><path d="M3 12.4h18a9 9 0 0 1-18 0Z"/><ellipse cx="7.8" cy="9.6" rx="2.1" ry="1.35" fill="none"/><ellipse cx="12.4" cy="8.6" rx="2.1" ry="1.35" fill="none"/><ellipse cx="16.6" cy="10" rx="2.1" ry="1.35" fill="none"/></symbol>
+<symbol id="i-potato" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="8.6" ry="6.4" transform="rotate(-18 12 12)"/><circle cx="9.2" cy="10.4" r=".95" fill="none"/><circle cx="14.2" cy="13.6" r=".95" fill="none"/></symbol>
+<symbol id="i-grain" viewBox="0 0 24 24"><path fill="none" d="M12 21.2V9.4"/><path d="M12 9.4c0-3 1.7-5.1 4.1-6.1.4 2.7-1 5.1-4.1 6.1ZM12 9.4c0-3-1.7-5.1-4.1-6.1-.4 2.7 1 5.1 4.1 6.1ZM12 15.4c0-3 1.7-5.1 4.1-6.1.4 2.7-1 5.1-4.1 6.1ZM12 15.4c0-3-1.7-5.1-4.1-6.1-.4 2.7 1 5.1 4.1 6.1Z"/></symbol>
+<symbol id="i-beans" viewBox="0 0 24 24"><ellipse cx="8.4" cy="8.8" rx="4.3" ry="3" transform="rotate(-25 8.4 8.8)"/><ellipse cx="15.2" cy="11.6" rx="4.3" ry="3" transform="rotate(20 15.2 11.6)"/><ellipse cx="10.4" cy="16.2" rx="4.3" ry="3" transform="rotate(-8 10.4 16.2)"/></symbol>
+<symbol id="i-tofu" viewBox="0 0 24 24"><path d="M12 3.2 20.2 7.8v8.4L12 20.8 3.8 16.2V7.8Z"/><path fill="none" d="m3.8 7.8 8.2 4.6 8.2-4.6M12 12.4v8.4"/></symbol>
+<symbol id="i-leaf" viewBox="0 0 24 24"><path d="M20.4 3.6C10.2 3.6 4 8.8 4 15c0 2 1 4.2 1 4.2s6.2-1 9.2-4c3.1-3.1 6.2-11.6 6.2-11.6Z"/><path fill="none" d="M5 19.2C8.1 14.2 12.2 10 17.2 7"/></symbol>
+<symbol id="i-root" viewBox="0 0 24 24"><path d="M16.8 7.2 8.6 19.8a1.4 1.4 0 0 1-2.2.2l-1.4-1.4a1.4 1.4 0 0 1 .2-2.2Z"/><path fill="none" d="m16.8 7.2 1.5-3.2M16.8 7.2l3.3-.9M16.8 7.2l-.7-3.3"/></symbol>
+<symbol id="i-tomato" viewBox="0 0 24 24"><circle cx="12" cy="13.6" r="7"/><path fill="none" d="M12 6.6V4.2M12 6.6c-1.6-1.6-3.1-1.9-4.2-1.7.2 1.5 1.1 2.7 2.5 3.3M12 6.6c1.6-1.6 3.1-1.9 4.2-1.7-.2 1.5-1.1 2.7-2.5 3.3"/></symbol>
+<symbol id="i-mushroom" viewBox="0 0 24 24"><path d="M3.8 11.2a8.2 8.2 0 0 1 16.4 0Z"/><path fill="none" d="M9.6 11.2v5.6a2.4 2.4 0 0 0 4.8 0v-5.6"/></symbol>
+<symbol id="i-avocado" viewBox="0 0 24 24"><path d="M12 2.8c4 0 7.1 4.1 7.1 8.7S16 21.2 12 21.2s-7.1-4.6-7.1-9.7S8 2.8 12 2.8Z"/><ellipse cx="12" cy="13.6" rx="3.2" ry="3.7" fill="none"/></symbol>
+<symbol id="i-banana" viewBox="0 0 24 24"><path d="M3.8 6.6c0 7.4 5.3 12.6 12.6 12.6 2.1 0 4-.6 4-2.1 0-1.1-1-1.3-2.5-1.3-6.3-.1-11.1-4.9-11.4-10.8C6.4 4 5.9 3.4 5.1 3.4c-1 0-1.3 1-1.3 3.2Z"/></symbol>
+<symbol id="i-grapes" viewBox="0 0 24 24"><circle cx="12" cy="8.6" r="2.4"/><circle cx="8.6" cy="12.6" r="2.4"/><circle cx="15.4" cy="12.6" r="2.4"/><circle cx="12" cy="16.6" r="2.4"/><path fill="none" d="M12 6.2V3.4"/></symbol>
+<symbol id="i-berry" viewBox="0 0 24 24"><circle cx="9.2" cy="14.4" r="4.6"/><circle cx="15.8" cy="12.4" r="3.6"/><path fill="none" d="M9.2 9.8V6.2M15.8 8.8V6"/></symbol>
+<symbol id="i-apple" viewBox="0 0 24 24"><path d="M12 7c-1.6-1.6-5.2-1.7-6.8 1.2C3.4 11.5 5.3 19.4 8.6 19.4c1.2 0 2.1-.6 3.4-.6s2.2.6 3.4.6c3.3 0 5.2-7.9 3.4-11.2C17.2 5.3 13.6 5.4 12 7Z"/><path fill="none" d="M12 7V4.1M12 4.1c1.7-1.1 3.1-.9 3.1-.9s-.2 1.7-1.7 2.3"/></symbol>
+<symbol id="i-dried" viewBox="0 0 24 24"><ellipse cx="9" cy="12.6" rx="4" ry="5.1" transform="rotate(-20 9 12.6)"/><ellipse cx="15.4" cy="14.4" rx="3.3" ry="4.1" transform="rotate(15 15.4 14.4)"/></symbol>
+<symbol id="i-nut" viewBox="0 0 24 24"><path d="M12 2.8c3.6 2.6 5.7 6.2 5.7 10.3A5.7 5.7 0 0 1 12 21.2a5.7 5.7 0 0 1-5.7-8.1c0-4.1 2.1-7.7 5.7-10.3Z"/><path fill="none" d="M12 7.6c-1.7 2.1-2.5 4.3-2.5 6.6"/></symbol>
+<symbol id="i-seed" viewBox="0 0 24 24"><ellipse cx="7.8" cy="8.6" rx="2.3" ry="1.35" transform="rotate(-30 7.8 8.6)"/><ellipse cx="15.2" cy="10.6" rx="2.3" ry="1.35" transform="rotate(20 15.2 10.6)"/><ellipse cx="9.8" cy="14.8" rx="2.3" ry="1.35" transform="rotate(-10 9.8 14.8)"/><ellipse cx="16" cy="16.4" rx="2.3" ry="1.35" transform="rotate(35 16 16.4)"/></symbol>
+<symbol id="i-oil" viewBox="0 0 24 24"><path d="M9.4 8.2h5.2l1.6 3.2v8.4a1 1 0 0 1-1 1H8.8a1 1 0 0 1-1-1V11.4Z"/><path fill="none" d="M10.4 8.2V4.4h3.2v3.8M10.6 15.4h2.8"/></symbol>
+<symbol id="i-water" viewBox="0 0 24 24"><path d="M6 4.8h12l-1.4 14.4a1.6 1.6 0 0 1-1.6 1.4H9a1.6 1.6 0 0 1-1.6-1.4Z"/><path fill="none" d="M6.8 12.2h10.4"/></symbol>
+<symbol id="i-coffee" viewBox="0 0 24 24"><path d="M4.4 8h12v6.2a6 6 0 0 1-12 0Z"/><path fill="none" d="M16.4 9.6h2.2a2.3 2.3 0 0 1 0 4.6h-2.2M3.4 20.4h14"/></symbol>
+<symbol id="i-drink" viewBox="0 0 24 24"><path d="M7 3.6h10l-1 16.4a1 1 0 0 1-1 .9H9a1 1 0 0 1-1-.9Z"/><path fill="none" d="M7.2 8h9.6"/></symbol>
+<symbol id="i-chocolate" viewBox="0 0 24 24"><rect x="3.8" y="5.8" width="16.4" height="12.4" rx="1.6"/><path fill="none" d="M3.8 9.9h16.4M3.8 14h16.4M9.3 5.8v12.4M14.7 5.8v12.4"/></symbol>
+<symbol id="i-honey" viewBox="0 0 24 24"><path d="M12 2.6s5.4 6.4 5.4 10.1a5.4 5.4 0 0 1-10.8 0C6.6 9 12 2.6 12 2.6Z"/></symbol>
+<symbol id="i-cookie" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><circle cx="9.4" cy="9.8" r="1.1" fill="none"/><circle cx="14.2" cy="13" r="1.1" fill="none"/><circle cx="10.4" cy="15.2" r="1.1" fill="none"/></symbol>
+<symbol id="i-pastry" viewBox="0 0 24 24"><path d="M2.8 16.4c0-6 4.1-10.2 9.2-10.2s9.2 4.2 9.2 10.2c-2-1.5-4.1-2-6.1-1.4-1.7-2-4.5-2-6.2 0-2-.6-4.1-.1-6.1 1.4Z"/></symbol>
+<symbol id="i-icecream" viewBox="0 0 24 24"><path d="M7.6 10.2h8.8l-3.7 10a.8.8 0 0 1-1.4 0Z"/><path fill="none" d="M7.4 10.2a4.6 4.6 0 0 1 9.2 0"/></symbol>
+<symbol id="i-chips" viewBox="0 0 24 24"><path d="M4.6 8.4h14.8l-1.3 10.2a2 2 0 0 1-2 1.8H7.9a2 2 0 0 1-2-1.8Z"/><path fill="none" d="M4.6 8.4 6.2 5h11.6l1.6 3.4"/></symbol>
+<symbol id="i-powder" viewBox="0 0 24 24"><rect x="5.4" y="8" width="13.2" height="12.4" rx="1.6"/><rect x="7.6" y="3.8" width="8.8" height="4.2" rx="1.2"/><path fill="none" d="M9 13.4h6"/></symbol>
+<symbol id="i-pizza" viewBox="0 0 24 24"><path d="M12 2.8 21.2 19a28 28 0 0 1-18.4 0Z"/><circle cx="10" cy="13.4" r="1.15" fill="none"/><circle cx="14" cy="15.4" r="1.15" fill="none"/><circle cx="12" cy="9" r="1.05" fill="none"/></symbol>
+<symbol id="i-burger" viewBox="0 0 24 24"><path d="M3.4 9.2a8.6 8.6 0 0 1 17.2 0Z"/><rect x="3.4" y="10.8" width="17.2" height="2.6" rx="1.3"/><path d="M3.4 16.6a2 2 0 0 1 2-2h13.2a2 2 0 0 1 2 2 2.5 2.5 0 0 1-2.5 2.5H5.9a2.5 2.5 0 0 1-2.5-2.5Z"/></symbol>
+<symbol id="i-soup" viewBox="0 0 24 24"><path d="M3 12.2h18a9 9 0 0 1-18 0Z"/><path fill="none" d="M9 9.2c.9-1.1.3-2.2-.5-3.2M13.4 9.2c.9-1.1.3-2.2-.5-3.2M2 20.6h20"/></symbol>
+<symbol id="i-sushi" viewBox="0 0 24 24"><rect x="3.6" y="7.8" width="16.8" height="9" rx="2.4"/><circle cx="12" cy="12.3" r="2.5" fill="none"/></symbol>
+<symbol id="i-plate" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.8"/><circle cx="12" cy="12" r="5" fill="none"/></symbol>
+</defs></svg>
+
+<header class="top">
+  <div class="top-in">
+    <span class="brand">Fonte <i>&amp;</i> Macros</span>
+    <div class="top-meta">
+      <span id="hdPoidsL">Poids <b id="hdPoids">—</b></span>
+      <span id="hdKcalL">Cible <b id="hdKcal">—</b></span>
+      <span id="hdSync"></span>
+      <span class="lang"><button data-lang="fr">FR</button><button data-lang="ar">العربية</button></span>
+    </div>
+  </div>
+</header>
+<nav class="rail"><div class="rail-in" role="tablist" id="rail"></div></nav>
+<main id="vue"></main>
+<input type="file" id="fileIn" accept="image/*" hidden>
+
+<script>
+/* ============================ ALIMENTS ============================ */
+/* [nom FR, categorie, kcal, proteines, glucides, lipides] — pour 100 g (ou 100 ml) */
+const BASE=[
+["Blanc de poulet","V",110,23,0,1.8],["Cuisse de poulet sans peau","V",120,19.5,0,4.8],["Escalope de dinde","V",104,23,0,1.2],
+["Steak hache 5% MG","V",125,21,0,5],["Steak hache 15% MG","V",207,19,0,14.5],["Bavette de bœuf","V",170,26,0,7.5],
+["Rumsteck","V",142,23,0,5.5],["Filet mignon de porc","V",136,22,0,5],["Jambon blanc decouenne","V",110,20,1,3],
+["Jambon cru","V",240,27,0.5,14.5],["Cote d'agneau","V",230,20,0,17],["Escalope de veau","V",115,21,0,3.5],
+["Lapin","V",137,21,0,6],["Foie de veau","V",140,20,3,5],["Saucisse de Toulouse","V",290,15,1,25],
+["Merguez","V",320,14,1.5,29],["Bacon grille","V",350,25,1,28],["Magret de canard","V",290,19,0,24],
+["Viande hachee d'agneau","V",250,18,0,20],["Gesiers de volaille","V",120,21,0,4],
+
+["Saumon frais","P",206,20,0,13],["Saumon fume","P",180,22,0.5,10],["Thon au naturel (boite)","P",116,26,0,1],
+["Thon frais","P",144,23,0,5],["Cabillaud","P",82,18,0,0.7],["Colin / merlu","P",83,17,0,1.3],
+["Sardines a l'huile egouttees","P",220,25,0,13],["Maquereau","P",205,19,0,14],["Truite","P",148,20,0,7],
+["Dorade","P",96,20,0,1.5],["Sole","P",86,18,0,1.2],["Crevettes cuites","P",99,21,0.5,1],
+["Moules cuites","P",86,15,4,2],["Calamar","P",92,16,3,1.4],["Surimi","P",95,9,12,1],["Hareng fume","P",215,20,0,15],
+
+["Œuf entier","L",143,12.5,0.7,10],["Blanc d'œuf","L",52,11,0.7,0.2],["Jaune d'œuf","L",322,16,0.6,28],
+["Lait entier","L",64,3.2,4.8,3.5],["Lait demi-ecreme","L",46,3.3,4.8,1.6],["Lait ecreme","L",34,3.4,4.9,0.1],
+["Yaourt nature","L",61,4,5,3],["Yaourt grec 0%","L",57,10,3.6,0.4],["Skyr","L",63,11,4,0.2],
+["Fromage blanc 0%","L",46,8,4,0.2],["Fromage blanc 3%","L",73,7.5,4.5,3],["Cottage cheese","L",98,11,3.4,4.3],
+["Comte","L",410,27,0.5,33],["Emmental","L",380,28,1,29],["Mozzarella","L",280,18,2,22],["Feta","L",264,14,4,21],
+["Parmesan","L",400,36,3,27],["Camembert","L",300,20,0.5,24],["Chevre frais","L",206,14,2,16],
+["Beurre","L",750,0.7,0.6,82],["Creme fraiche 30%","L",290,2.3,3,30],["Creme legere 5%","L",85,3,4,5],["Ricotta","L",150,10,3,10],
+
+["Riz blanc cuit","F",130,2.7,28,0.3],["Riz basmati cuit","F",121,3,25,0.4],["Riz complet cuit","F",112,2.6,23,0.9],
+["Pates cuites","F",158,5.8,31,0.9],["Pates completes cuites","F",124,5,25,1.1],["Semoule / couscous cuit","F",112,3.8,23,0.2],
+["Quinoa cuit","F",120,4.4,21,1.9],["Boulgour cuit","F",112,3.1,24,0.3],["Pomme de terre cuite","F",86,2,19,0.1],
+["Patate douce cuite","F",90,2,21,0.1],["Pain complet","F",247,10,42,3],["Pain de mie","F",270,8,48,4],
+["Baguette","F",274,9,55,1.3],["Pain aux cereales","F",260,10,41,5],["Flocons d'avoine","F",375,13,59,7],
+["Muesli sans sucre ajoute","F",370,11,60,8],["Corn flakes","F",380,7,84,1],["Galette de riz souffle","F",385,8,81,3],
+["Tortilla de ble","F",310,8,51,8],["Couscous sec","F",360,12,72,1.5],["Polenta cuite","F",85,2,18,0.4],
+["Riz blanc cru","F",355,7,78,0.6],["Pates crues","F",360,12.5,72,1.5],
+
+["Lentilles vertes cuites","G",116,9,20,0.4],["Pois chiches cuits","G",164,8.9,27,2.6],["Haricots rouges cuits","G",127,8.7,22,0.5],
+["Haricots blancs cuits","G",139,9.7,25,0.5],["Pois casses cuits","G",118,8.3,21,0.4],["Feves cuites","G",110,7.6,19,0.4],
+["Tofu ferme","G",145,16,3,8],["Tempeh","G",190,19,9,11],["Edamame","G",121,12,9,5],
+["Proteine de soja texturee","G",340,50,30,1.5],["Houmous","G",240,8,16,16],["Lentilles corail cuites","G",120,8.5,20,0.5],
+
+["Brocoli cuit","Z",35,2.8,4,0.4],["Courgette","Z",17,1.2,2,0.3],["Haricots verts","Z",31,1.8,5,0.1],
+["Epinards cuits","Z",23,2.9,1.5,0.4],["Carotte","Z",41,0.9,8,0.2],["Tomate","Z",18,0.9,3,0.2],
+["Concombre","Z",15,0.7,2.5,0.1],["Poivron","Z",26,1,5,0.3],["Oignon","Z",40,1.1,8,0.1],["Ail","Z",149,6.4,30,0.5],
+["Salade verte","Z",15,1.4,1.5,0.2],["Chou-fleur","Z",25,2,3,0.3],["Champignons de Paris","Z",22,3,1,0.3],
+["Aubergine","Z",25,1,4,0.2],["Petits pois","Z",81,5.4,12,0.4],["Betterave cuite","Z",43,1.6,8,0.2],
+["Avocat","Z",160,2,2,15],["Mais doux","Z",86,3.3,17,1.2],["Chou kale","Z",49,4.3,5,0.9],["Asperge","Z",20,2.2,2,0.1],
+["Poireau","Z",30,1.5,5.5,0.3],["Potiron","Z",26,1,5,0.1],["Chou de Bruxelles","Z",43,3.4,7,0.3],
+
+["Banane","R",89,1.1,20,0.3],["Pomme","R",52,0.3,12,0.2],["Orange","R",47,0.9,9,0.1],["Fraise","R",32,0.7,6,0.3],
+["Myrtille","R",57,0.7,12,0.3],["Framboise","R",52,1.2,9,0.7],["Raisin","R",69,0.7,16,0.2],["Kiwi","R",61,1.1,12,0.5],
+["Mangue","R",60,0.8,14,0.4],["Ananas","R",50,0.5,12,0.1],["Poire","R",57,0.4,13,0.1],["Peche","R",39,0.9,8,0.2],
+["Pasteque","R",30,0.6,7,0.2],["Melon","R",34,0.8,8,0.2],["Datte sechee","R",282,2.5,68,0.4],["Abricot sec","R",241,3.4,53,0.5],
+["Raisin sec","R",299,3.1,73,0.5],["Pruneau","R",240,2.2,56,0.4],["Citron","R",29,1.1,6,0.3],["Clementine","R",47,0.8,11,0.2],
+["Grenade","R",83,1.7,17,1.2],["Figue fraiche","R",74,0.8,16,0.3],
+
+["Amande","N",600,21,7,52],["Noix","N",654,15,7,65],["Noisette","N",628,15,8,61],["Noix de cajou","N",553,18,27,44],
+["Pistache","N",560,20,19,45],["Cacahuete","N",567,26,11,49],["Beurre de cacahuete","N",588,25,15,50],
+["Graine de chia","N",486,17,8,31],["Graine de lin","N",534,18,2,42],["Graine de courge","N",559,30,11,49],
+["Graine de tournesol","N",584,21,11,51],["Noix de coco rapee","N",660,7,7,65],["Puree d'amande","N",630,21,8,56],
+
+["Huile d'olive","M",900,0,0,100],["Huile de colza","M",900,0,0,100],["Huile de coco","M",900,0,0,100],
+["Margarine","M",720,0.2,0.5,80],["Mayonnaise","M",680,1,2,74],["Vinaigrette allegee","M",180,0.5,6,17],
+
+["Eau","B",0,0,0,0],["Cafe noir","B",2,0.2,0,0],["The infuse","B",1,0,0.2,0],["Jus d'orange","B",45,0.7,10,0.1],
+["Coca-Cola","B",42,0,10.6,0],["Cola zero","B",0.3,0,0,0],["Biere blonde 5%","B",43,0.5,3.5,0],
+["Vin rouge","B",85,0.1,2.6,0],["Lait d'amande non sucre","B",15,0.5,0.3,1.2],["Boisson de soja","B",40,3.3,2.5,1.8],
+
+["Chocolat noir 70%","S",570,8,33,42],["Chocolat au lait","S",535,7.5,57,30],["Miel","S",304,0.3,82,0],
+["Sucre blanc","S",400,0,100,0],["Confiture","S",270,0.4,66,0.1],["Pate a tartiner choco-noisette","S",539,6,57,31],
+["Biscuit sec type petit-beurre","S",450,7,75,13],["Croissant","S",406,8,46,21],["Pain au chocolat","S",414,7,46,22],
+["Glace vanille","S",207,3.5,24,11],["Chips","S",536,6,50,34],["Barre chocolatee","S",480,5,60,24],["Cookie","S",470,5,62,22],
+
+["Whey en poudre","C",390,80,7,5],["Caseine en poudre","C",370,78,6,3],["Proteine de pois en poudre","C",380,78,5,5],
+["Creatine monohydrate","C",0,0,0,0],["Gainer en poudre","C",380,20,65,4],["Maltodextrine","C",380,0,95,0],
+
+["Pizza margherita","A",266,11,33,10],["Frites","A",312,3.4,41,15],["Burger maison","A",250,15,20,12],
+["Kebab (sandwich)","A",215,15,15,11],["Couscous poulet-merguez","A",150,9,16,5],["Tajine de poulet","A",120,11,8,5],
+["Riz cantonais","A",165,7,23,5],["Lasagnes","A",160,8,15,8],["Quiche lorraine","A",270,10,20,17],
+["Sandwich jambon-beurre","A",250,10,32,9],["Sushi","A",150,6,28,1.5],["Salade cesar","A",180,10,8,12],
+["Omelette nature","A",155,11,1,12],["Soupe de legumes","A",35,1.2,6,0.5],["Harira","A",70,3.5,10,2],
+["Poulet roti avec peau","A",220,25,0,13],["Paella","A",160,9,20,5]
+];
+
+/* noms arabes */
+const AR_NOM={
+"Blanc de poulet":"صدر دجاج","Cuisse de poulet sans peau":"فخذ دجاج بدون جلد","Escalope de dinde":"شريحة ديك رومي",
+"Steak hache 5% MG":"لحم بقري مفروم 5% دسم","Steak hache 15% MG":"لحم بقري مفروم 15% دسم","Bavette de bœuf":"بافيت بقري",
+"Rumsteck":"رمستيك بقري","Filet mignon de porc":"فيليه خنزير","Jambon blanc decouenne":"جامبون أبيض",
+"Jambon cru":"جامبون نيء","Cote d'agneau":"ضلع غنم","Escalope de veau":"شريحة عجل",
+"Lapin":"أرنب","Foie de veau":"كبد عجل","Saucisse de Toulouse":"نقانق تولوز",
+"Merguez":"مرقاز","Bacon grille":"بيكون مشوي","Magret de canard":"صدر بط",
+"Viande hachee d'agneau":"لحم غنم مفروم","Gesiers de volaille":"قوانص دجاج",
+"Saumon frais":"سلمون طازج","Saumon fume":"سلمون مدخّن","Thon au naturel (boite)":"تونة معلّبة في الماء",
+"Thon frais":"تونة طازجة","Cabillaud":"سمك القد","Colin / merlu":"نازلي",
+"Sardines a l'huile egouttees":"سردين بالزيت مصفّى","Maquereau":"ماكريل","Truite":"تروتة",
+"Dorade":"دوراد","Sole":"سمك موسى","Crevettes cuites":"جمبري مطبوخ",
+"Moules cuites":"بلح البحر مطبوخ","Calamar":"كاليمار","Surimi":"سوريمي","Hareng fume":"رنجة مدخّنة",
+"Œuf entier":"بيضة كاملة","Blanc d'œuf":"بياض البيض","Jaune d'œuf":"صفار البيض",
+"Lait entier":"حليب كامل الدسم","Lait demi-ecreme":"حليب نصف دسم","Lait ecreme":"حليب خالي الدسم",
+"Yaourt nature":"ياغورت طبيعي","Yaourt grec 0%":"ياغورت يوناني 0%","Skyr":"سكير",
+"Fromage blanc 0%":"جبن أبيض 0%","Fromage blanc 3%":"جبن أبيض 3%","Cottage cheese":"جبن قريش",
+"Comte":"جبن كونتي","Emmental":"جبن إمنتال","Mozzarella":"موزاريلا","Feta":"جبن فيتا",
+"Parmesan":"بارميزان","Camembert":"كامامبير","Chevre frais":"جبن ماعز طازج",
+"Beurre":"زبدة","Creme fraiche 30%":"كريمة طازجة 30%","Creme legere 5%":"كريمة خفيفة 5%","Ricotta":"ريكوتا",
+"Riz blanc cuit":"أرز أبيض مطبوخ","Riz basmati cuit":"أرز بسمتي مطبوخ","Riz complet cuit":"أرز كامل مطبوخ",
+"Pates cuites":"معكرونة مطبوخة","Pates completes cuites":"معكرونة كاملة مطبوخة","Semoule / couscous cuit":"سميد / كسكس مطبوخ",
+"Quinoa cuit":"كينوا مطبوخة","Boulgour cuit":"برغل مطبوخ","Pomme de terre cuite":"بطاطس مسلوقة",
+"Patate douce cuite":"بطاطا حلوة مطبوخة","Pain complet":"خبز كامل","Pain de mie":"خبز التوست",
+"Baguette":"خبز باغيت","Pain aux cereales":"خبز بالحبوب","Flocons d'avoine":"رقائق الشوفان",
+"Muesli sans sucre ajoute":"موسلي بدون سكر مضاف","Corn flakes":"رقائق الذرة","Galette de riz souffle":"قرص أرز منفوش",
+"Tortilla de ble":"تورتيلا قمح","Couscous sec":"كسكس جاف","Polenta cuite":"بولينتا مطبوخة",
+"Riz blanc cru":"أرز أبيض نيء","Pates crues":"معكرونة نيئة",
+"Lentilles vertes cuites":"عدس أخضر مطبوخ","Pois chiches cuits":"حمّص مطبوخ","Haricots rouges cuits":"فاصوليا حمراء مطبوخة",
+"Haricots blancs cuits":"فاصوليا بيضاء مطبوخة","Pois casses cuits":"بازلاء مجروشة مطبوخة","Feves cuites":"فول مطبوخ",
+"Tofu ferme":"توفو صلب","Tempeh":"تمبيه","Edamame":"إدامامي",
+"Proteine de soja texturee":"بروتين الصويا المنسوج","Houmous":"حمّص بالطحينة","Lentilles corail cuites":"عدس أحمر مطبوخ",
+"Brocoli cuit":"بروكلي مطبوخ","Courgette":"كوسة","Haricots verts":"فاصوليا خضراء",
+"Epinards cuits":"سبانخ مطبوخة","Carotte":"جزر","Tomate":"طماطم",
+"Concombre":"خيار","Poivron":"فلفل حلو","Oignon":"بصل","Ail":"ثوم",
+"Salade verte":"خس","Chou-fleur":"قرنبيط","Champignons de Paris":"فطر شامبينيون",
+"Aubergine":"باذنجان","Petits pois":"بازلاء خضراء","Betterave cuite":"شمندر مطبوخ",
+"Avocat":"أفوكادو","Mais doux":"ذرة حلوة","Chou kale":"كرنب كايل","Asperge":"هليون",
+"Poireau":"كرّاث","Potiron":"قرع","Chou de Bruxelles":"كرنب بروكسل",
+"Banane":"موز","Pomme":"تفاح","Orange":"برتقال","Fraise":"فراولة",
+"Myrtille":"توت أزرق","Framboise":"توت العليق","Raisin":"عنب","Kiwi":"كيوي",
+"Mangue":"مانجو","Ananas":"أناناس","Poire":"إجاص","Peche":"خوخ",
+"Pasteque":"دلاح","Melon":"شمام","Datte sechee":"تمر","Abricot sec":"مشمش مجفف",
+"Raisin sec":"زبيب","Pruneau":"برقوق مجفف","Citron":"ليمون","Clementine":"كليمنتين",
+"Grenade":"رمان","Figue fraiche":"تين طازج",
+"Amande":"لوز","Noix":"جوز","Noisette":"بندق","Noix de cajou":"كاجو",
+"Pistache":"فستق","Cacahuete":"فول سوداني","Beurre de cacahuete":"زبدة الفول السوداني",
+"Graine de chia":"بذور الشيا","Graine de lin":"بذور الكتان","Graine de courge":"بذور القرع",
+"Graine de tournesol":"بذور عباد الشمس","Noix de coco rapee":"جوز الهند المبشور","Puree d'amande":"زبدة اللوز",
+"Huile d'olive":"زيت الزيتون","Huile de colza":"زيت الكانولا","Huile de coco":"زيت جوز الهند",
+"Margarine":"مارغرين","Mayonnaise":"مايونيز","Vinaigrette allegee":"صلصة خل خفيفة",
+"Eau":"ماء","Cafe noir":"قهوة سوداء","The infuse":"شاي","Jus d'orange":"عصير برتقال",
+"Coca-Cola":"كوكا كولا","Cola zero":"كولا زيرو","Biere blonde 5%":"جعة شقراء 5%",
+"Vin rouge":"نبيذ أحمر","Lait d'amande non sucre":"حليب اللوز بدون سكر","Boisson de soja":"مشروب الصويا",
+"Chocolat noir 70%":"شوكولاتة داكنة 70%","Chocolat au lait":"شوكولاتة بالحليب","Miel":"عسل",
+"Sucre blanc":"سكر أبيض","Confiture":"مربى","Pate a tartiner choco-noisette":"كريمة الشوكولاتة بالبندق",
+"Biscuit sec type petit-beurre":"بسكويت سادة","Croissant":"كرواسون","Pain au chocolat":"بان أو شوكولا",
+"Glace vanille":"آيس كريم فانيليا","Chips":"رقائق البطاطس","Barre chocolatee":"لوح شوكولاتة","Cookie":"كوكي",
+"Whey en poudre":"بروتين واي مسحوق","Caseine en poudre":"كازين مسحوق","Proteine de pois en poudre":"بروتين البازلاء مسحوق",
+"Creatine monohydrate":"كرياتين مونوهيدرات","Gainer en poudre":"غينر مسحوق","Maltodextrine":"مالتوديكسترين",
+"Pizza margherita":"بيتزا مارغريتا","Frites":"بطاطس مقلية","Burger maison":"برغر منزلي",
+"Kebab (sandwich)":"ساندويتش كباب","Couscous poulet-merguez":"كسكس بالدجاج والمرقاز","Tajine de poulet":"طاجين دجاج",
+"Riz cantonais":"أرز كانتوني","Lasagnes":"لازانيا","Quiche lorraine":"كيش لورين",
+"Sandwich jambon-beurre":"ساندويتش جامبون بالزبدة","Sushi":"سوشي","Salade cesar":"سلطة سيزر",
+"Omelette nature":"عجة سادة","Soupe de legumes":"شوربة خضار","Harira":"حريرة",
+"Poulet roti avec peau":"دجاج مشوي بالجلد","Paella":"بايلا"
+};
+
+/* ============================ VIGNETTES ============================ */
+/* extensions des photos embarquees, par slug — remplace par genere-photos.js */
+const PHOTOS={"abricot-sec":"jpg","ail":"jpg","amande":"jpg","ananas":"jpg","asperge":"jpg","aubergine":"jpg","avocat":"jpg","bacon-grille":"png","baguette":"jpg","banane":"jpg","barre-chocolatee":"jpg","bavette-de-b-uf":"jpg","betterave-cuite":"png","beurre":"jpg","beurre-de-cacahuete":"jpg","biere-blonde-5":"jpg","biscuit-sec-type-petit-beurre":"jpg","blanc-d-uf":"jpg","blanc-de-poulet":"jpg","boisson-de-soja":"jpg","boulgour-cuit":"jpg","brocoli-cuit":"jpg","burger-maison":"jpg","cabillaud":"jpg","cacahuete":"jpg","cafe-noir":"jpg","calamar":"jpg","camembert":"jpg","carotte":"jpg","caseine-en-poudre":"jpg","champignons-de-paris":"jpg","chevre-frais":"jpg","chips":"jpg","chocolat-au-lait":"jpg","chocolat-noir-70":"jpg","chou-de-bruxelles":"jpg","chou-kale":"jpg","chou-fleur":"jpg","citron":"jpg","clementine":"jpg","coca-cola":"jpg","cola-zero":"jpg","colin-merlu":"jpg","comte":"jpg","concombre":"jpg","confiture":"jpg","cookie":"png","corn-flakes":"jpg","cote-d-agneau":"jpg","cottage-cheese":"jpg","courgette":"jpg","couscous-poulet-merguez":"jpg","couscous-sec":"jpg","creatine-monohydrate":"jpg","creme-fraiche-30":"jpg","creme-legere-5":"jpg","crevettes-cuites":"jpg","croissant":"jpg","cuisse-de-poulet-sans-peau":"jpg","datte-sechee":"jpg","dorade":"jpg","eau":"jpg","edamame":"jpg","emmental":"jpg","epinards-cuits":"jpg","escalope-de-dinde":"jpg","escalope-de-veau":"jpg","feta":"jpg","feves-cuites":"jpg","figue-fraiche":"jpg","filet-mignon-de-porc":"jpg","flocons-d-avoine":"jpg","foie-de-veau":"jpg","fraise":"jpg","framboise":"jpg","frites":"jpg","fromage-blanc-0":"jpg","fromage-blanc-3":"jpg","gainer-en-poudre":"jpg","galette-de-riz-souffle":"jpg","gesiers-de-volaille":"jpg","glace-vanille":"jpg","graine-de-chia":"jpg","graine-de-courge":"jpg","graine-de-lin":"jpg","graine-de-tournesol":"jpg","grenade":"jpg","hareng-fume":"jpg","haricots-blancs-cuits":"jpg","haricots-rouges-cuits":"jpg","haricots-verts":"jpg","harira":"png","houmous":"jpg","huile-d-olive":"jpg","huile-de-coco":"jpg","huile-de-colza":"jpg","jambon-blanc-decouenne":"jpg","jambon-cru":"jpg","jaune-d-uf":"jpg","jus-d-orange":"jpg","kebab-sandwich":"jpg","kiwi":"jpg","lait-d-amande-non-sucre":"jpg","lait-demi-ecreme":"jpg","lait-ecreme":"jpg","lait-entier":"jpg","lapin":"jpg","lasagnes":"jpg","lentilles-corail-cuites":"png","lentilles-vertes-cuites":"png","magret-de-canard":"jpg","mais-doux":"jpg","maltodextrine":"jpg","mangue":"jpg","maquereau":"jpg","margarine":"jpg","mayonnaise":"jpg","melon":"jpg","merguez":"jpg","miel":"jpg","moules-cuites":"jpg","mozzarella":"jpg","muesli-sans-sucre-ajoute":"jpg","myrtille":"jpg","noisette":"jpg","noix":"jpg","noix-de-cajou":"jpg","noix-de-coco-rapee":"jpg","uf-entier":"jpg","oignon":"jpg","omelette-nature":"jpg","orange":"jpg","paella":"jpg","pain-au-chocolat":"jpg","pain-aux-cereales":"jpg","pain-complet":"jpg","pain-de-mie":"jpg","parmesan":"jpg","pasteque":"jpg","patate-douce-cuite":"jpg","pate-a-tartiner-choco-noisette":"jpg","pates-completes-cuites":"jpg","pates-crues":"png","pates-cuites":"jpg","peche":"jpg","petits-pois":"jpg","pistache":"jpg","pizza-margherita":"jpg","poire":"jpg","poireau":"jpg","pois-casses-cuits":"jpg","pois-chiches-cuits":"jpg","poivron":"jpg","polenta-cuite":"jpg","pomme":"jpg","pomme-de-terre-cuite":"jpg","potiron":"jpg","poulet-roti-avec-peau":"jpg","proteine-de-pois-en-poudre":"jpg","proteine-de-soja-texturee":"jpg","pruneau":"jpg","puree-d-amande":"jpg","quiche-lorraine":"jpg","quinoa-cuit":"jpg","raisin":"jpg","raisin-sec":"jpg","ricotta":"jpg","riz-basmati-cuit":"jpg","riz-blanc-cru":"jpg","riz-blanc-cuit":"jpg","riz-cantonais":"jpg","riz-complet-cuit":"jpg","rumsteck":"jpg","salade-cesar":"jpg","salade-verte":"jpg","sandwich-jambon-beurre":"jpg","sardines-a-l-huile-egouttees":"jpg","saucisse-de-toulouse":"jpg","saumon-frais":"jpg","saumon-fume":"jpg","semoule-couscous-cuit":"jpg","skyr":"jpg","sole":"jpg","soupe-de-legumes":"jpg","steak-hache-15-mg":"jpg","steak-hache-5-mg":"jpg","sucre-blanc":"png","surimi":"jpg","sushi":"jpg","tajine-de-poulet":"jpg","tempeh":"jpg","the-infuse":"jpg","thon-au-naturel-boite":"jpg","thon-frais":"jpg","tofu-ferme":"jpg","tomate":"jpg","tortilla-de-ble":"jpg","truite":"jpg","viande-hachee-d-agneau":"jpg","vin-rouge":"jpg","vinaigrette-allegee":"jpg","whey-en-poudre":"jpg","yaourt-grec-0":"jpg","yaourt-nature":"jpg"};
+/* dessin de repli, choisi par mot-cle sur le nom francais */
+const ICO_RULES=[
+[/puree d'amande|beurre de cacahuete/,"i-nut"],
+[/graine/,"i-seed"],
+[/amande|^noix|noix de|noisette|cajou|pistache|cacahuete|coco/,"i-nut"],
+[/poulet roti|paella|riz cantonais|lasagne|quiche|salade cesar|omelette|tajine|couscous poulet/,"i-plate"],
+[/pizza/,"i-pizza"],[/burger|kebab|sandwich/,"i-burger"],[/soupe|harira/,"i-soup"],[/sushi/,"i-sushi"],
+[/poulet|dinde|canard|volaille|gesier/,"i-poultry"],
+[/saucisse|merguez/,"i-sausage"],
+[/jambon|bacon/,"i-ham"],
+[/boeuf|bœuf|steak|bavette|rumsteck|agneau|veau|lapin|porc|viande|foie/,"i-meat"],
+[/crevette|moule|calamar|surimi/,"i-shell"],
+[/\(boite\)|conserve/,"i-can"],
+[/saumon|thon|cabillaud|colin|sardine|maquereau|truite|dorade|sole|hareng|poisson/,"i-fish"],
+[/oeuf|œuf|omelette/,"i-egg"],
+[/yaourt|skyr|fromage blanc|cottage|ricotta/,"i-yogurt"],
+[/fromage|comte|emmental|mozzarella|feta|parmesan|camembert|chevre/,"i-cheese"],
+[/^beurre$|margarine/,"i-butter"],
+[/lait|creme|boisson de soja/,"i-milk"],
+[/riz|galette de riz/,"i-rice"],
+[/pates|lasagne/,"i-pasta"],
+[/croissant|pain au chocolat/,"i-pastry"],
+[/pain|baguette|tortilla/,"i-bread"],
+[/flocons|muesli|corn flakes|avoine/,"i-oats"],
+[/pomme de terre|patate douce|frites/,"i-potato"],
+[/semoule|couscous|quinoa|boulgour|polenta|mais|ble/,"i-grain"],
+[/lentille|pois chiche|pois casse|haricots rouges|haricots blancs|feve|houmous|petits pois/,"i-beans"],
+[/tofu|tempeh|edamame|soja/,"i-tofu"],
+[/brocoli|chou|epinard|salade verte|kale|asperge|poireau|haricots verts/,"i-leaf"],
+[/carotte|betterave|oignon|ail|potiron|navet/,"i-root"],
+[/tomate|poivron|aubergine|courgette|concombre/,"i-tomato"],
+[/champignon/,"i-mushroom"],
+[/avocat/,"i-avocado"],
+[/banane/,"i-banana"],
+[/sec$|seche|pruneau|datte|abricot sec|raisin sec/,"i-dried"],
+[/raisin/,"i-grapes"],
+[/fraise|myrtille|framboise|grenade/,"i-berry"],
+[/pomme|poire|peche|orange|clementine|citron|kiwi|mangue|ananas|pasteque|melon|figue/,"i-apple"],
+[/huile|mayonnaise|vinaigrette/,"i-oil"],
+[/^eau$/,"i-water"],
+[/cafe|^the /,"i-coffee"],
+[/coca|cola|biere|vin |jus/,"i-drink"],
+[/chocolat|pate a tartiner/,"i-chocolate"],
+[/miel|sucre|confiture/,"i-honey"],
+[/biscuit|cookie|barre/,"i-cookie"],
+[/glace/,"i-icecream"],
+[/chips/,"i-chips"],
+[/whey|caseine|proteine|creatine|gainer|maltodextrine/,"i-powder"]
+];
+const ICO_CAT={V:"i-meat",P:"i-fish",L:"i-milk",F:"i-bread",G:"i-beans",Z:"i-leaf",R:"i-apple",
+  N:"i-nut",M:"i-oil",B:"i-drink",S:"i-cookie",C:"i-powder",A:"i-plate"};
+
+/* ============================ REFERENTIELS ============================ */
+const CATS={V:["Viandes & volailles","اللحوم والدواجن"],P:["Poissons & fruits de mer","الأسماك والمأكولات البحرية"],
+  L:["Œufs & produits laitiers","البيض ومشتقات الحليب"],F:["Feculents & cereales","النشويات والحبوب"],
+  G:["Legumineuses & vegetal","القطاني والبروتين النباتي"],Z:["Legumes","الخضروات"],R:["Fruits","الفواكه"],
+  N:["Noix & graines","المكسرات والبذور"],M:["Matieres grasses","الدهون والزيوت"],B:["Boissons","المشروبات"],
+  S:["Sucre & snacks","الحلويات والوجبات الخفيفة"],C:["Complements","المكملات الغذائية"],A:["Plats prepares","الأطباق الجاهزة"]};
+const ACT={
+  sedentaire:{f:1.2,  t:["Sedentaire — bureau, peu de marche","خامل — عمل مكتبي، مشي قليل"]},
+  leger:     {f:1.375,t:["Leger — 1 a 3 seances / semaine","خفيف — 1 إلى 3 حصص في الأسبوع"]},
+  modere:    {f:1.55, t:["Modere — 3 a 5 seances / semaine","متوسط — 3 إلى 5 حصص في الأسبوع"]},
+  intense:   {f:1.725,t:["Intense — 6 a 7 seances / semaine","مكثف — 6 إلى 7 حصص في الأسبوع"]},
+  athlete:   {f:1.9,  t:["Tres intense — travail physique + 2 seances/jour","مكثف جداً — عمل بدني + حصتان يومياً"]}
+};
+const OBJ={
+  seche:   {t:["Seche","تنشيف"],           r:{doux:-0.10,modere:-0.18,agressif:-0.25}},
+  recomp:  {t:["Recomposition","إعادة التركيب"],r:{doux:-0.05,modere:-0.08,agressif:-0.12}},
+  maintien:{t:["Maintien","الحفاظ على الوزن"], r:{doux:0,modere:0,agressif:0}},
+  masse:   {t:["Prise de masse","تضخيم"],  r:{doux:0.08,modere:0.12,agressif:0.20}}
+};
+const RYTHME={doux:["Doux","هادئ"],modere:["Modere","متوسط"],agressif:["Agressif","سريع"]};
+/* Liste de reference des prises. Un repas est enregistre par son index ici,
+   donc changer le nombre de prises ne deplace jamais ce qui est deja note. */
+const REPAS=[["Petit-dejeuner","الفطور"],["Collation du matin","وجبة خفيفة صباحية"],
+             ["Dejeuner","الغداء"],["Collation de l'apres-midi","وجبة خفيفة بعد الظهر"],
+             ["Diner","العشاء"],["Collation du soir","وجبة خفيفة مسائية"],
+             ["Repas unique","وجبة واحدة"]];
+const HEURE=[8,10.5,13,16.5,20,22,13];
+/* Pour chaque nombre de prises : quelles prises, et quelle part des calories du jour. */
+const PLANS={
+ 1:[[6,1]],
+ 2:[[2,.45],[4,.55]],
+ 3:[[0,.30],[2,.40],[4,.30]],
+ 4:[[0,.25],[2,.35],[3,.10],[4,.30]],
+ 5:[[0,.25],[2,.30],[3,.10],[4,.25],[5,.10]],
+ 6:[[0,.22],[1,.08],[2,.28],[3,.10],[4,.24],[5,.08]]
+};
+function plan(){ return PLANS[S.profil.nbRepas] || PLANS[4] }
+
+const PROGS={
+  fullbody:{t:["Full body 3 jours","فول بودي — 3 أيام"],
+    n:["Debutant, 0-12 mois de pratique. Chaque groupe musculaire est sollicite 3 fois par semaine.",
+       "للمبتدئين، من 0 إلى 12 شهراً من التمرين. كل مجموعة عضلية تُستهدف 3 مرات في الأسبوع."],
+    jours:[
+      {t:["Seance A","الحصة أ"],ex:[["Squat","4 x 6-8","2-3 min"],["Developpe couche","4 x 6-8","2-3 min"],["Rowing barre","4 x 8-10","2 min"],["Developpe militaire","3 x 8-10","2 min"],["Curl barre","3 x 10-12","90 s"],["Gainage planche","3 x 45 s","60 s"]]},
+      {t:["Seance B","الحصة ب"],ex:[["Souleve de terre roumain","4 x 6-8","2-3 min"],["Traction ou tirage vertical","4 x 6-10","2 min"],["Developpe incline halteres","4 x 8-10","2 min"],["Fentes marchees","3 x 10 / jambe","90 s"],["Extension triceps poulie","3 x 12","90 s"],["Releve de bassin","3 x 15","60 s"]]},
+      {t:["Seance C","الحصة ج"],ex:[["Souleve de terre","4 x 5","3 min"],["Dips ou developpe couche prise serree","4 x 8-10","2 min"],["Tirage horizontal","4 x 10-12","90 s"],["Presse a cuisses","3 x 12","2 min"],["Elevations laterales","4 x 15","60 s"],["Mollets debout","4 x 15","60 s"]]}
+    ]},
+  halfbody:{t:["Half body 4 jours","هاف بودي — 4 أيام"],
+    n:["Intermediaire. Haut / bas, chaque groupe 2 fois par semaine. Le meilleur rapport volume-recuperation.",
+       "للمستوى المتوسط. علوي / سفلي، كل مجموعة مرتين في الأسبوع. أفضل توازن بين الحجم والاستشفاء."],
+    jours:[
+      {t:["Haut 1 — force","الجزء العلوي 1 — قوة"],ex:[["Developpe couche","5 x 5","3 min"],["Rowing barre","4 x 6-8","2 min"],["Developpe militaire","4 x 6-8","2 min"],["Traction lestee","4 x 6-8","2 min"],["Curl barre EZ","3 x 8-10","90 s"],["Barre au front","3 x 8-10","90 s"]]},
+      {t:["Bas 1 — force","الجزء السفلي 1 — قوة"],ex:[["Squat","5 x 5","3 min"],["Souleve de terre roumain","4 x 8","2-3 min"],["Presse a cuisses","4 x 10","2 min"],["Leg curl","3 x 12","90 s"],["Mollets assis","4 x 15","60 s"],["Gainage lateral","3 x 40 s","45 s"]]},
+      {t:["Haut 2 — volume","الجزء العلوي 2 — حجم"],ex:[["Developpe incline halteres","4 x 10-12","90 s"],["Tirage vertical prise large","4 x 10-12","90 s"],["Ecartes poulie","3 x 15","60 s"],["Tirage horizontal","4 x 12","90 s"],["Elevations laterales","4 x 15-20","45 s"],["Curl incline + extension poulie","3 x 12 superset","75 s"]]},
+      {t:["Bas 2 — volume","الجزء السفلي 2 — حجم"],ex:[["Fentes bulgares","4 x 10 / jambe","90 s"],["Leg extension","4 x 15","60 s"],["Souleve de terre jambes tendues","4 x 12","90 s"],["Hip thrust","4 x 12","90 s"],["Mollets debout","5 x 20","45 s"],["Releve de jambes suspendu","3 x 12","60 s"]]}
+    ]},
+  ppl:{t:["Push / Pull / Legs 6 jours","دفع / سحب / أرجل — 6 أيام"],
+    n:["Avance, 2 ans de pratique et plus, avec une recuperation solide. Le cycle se repete deux fois par semaine.",
+       "للمتقدمين، سنتان فأكثر من التمرين مع استشفاء جيد. تُكرَّر الدورة مرتين في الأسبوع."],
+    jours:[
+      {t:["Push — pectoraux, epaules, triceps","دفع — صدر، أكتاف، ترايسبس"],ex:[["Developpe couche","4 x 6-8","2-3 min"],["Developpe militaire halteres","4 x 8-10","2 min"],["Developpe incline","3 x 10","90 s"],["Elevations laterales","4 x 15","45 s"],["Dips lestes","3 x 10","90 s"],["Extension triceps corde","3 x 15","60 s"]]},
+      {t:["Pull — dos, biceps","سحب — ظهر، بايسبس"],ex:[["Souleve de terre","4 x 5","3 min"],["Traction","4 x 8-10","2 min"],["Rowing barre","4 x 8-10","2 min"],["Tirage horizontal prise serree","3 x 12","90 s"],["Curl barre","4 x 10","75 s"],["Curl marteau","3 x 12","60 s"]]},
+      {t:["Legs — jambes complet","أرجل — تمرين كامل"],ex:[["Squat","4 x 6-8","3 min"],["Souleve de terre roumain","4 x 8-10","2 min"],["Presse a cuisses","4 x 12","2 min"],["Leg curl","4 x 12","75 s"],["Mollets debout","5 x 15","45 s"],["Gainage planche","3 x 60 s","45 s"]]}
+    ]}
+};
+/* Programmes d'endurance. Un bloc = une phase de la seance.
+   met = equivalent metabolique, qui sert a estimer la depense depuis ton poids :
+   kcal = met x poids en kg x duree en heures. */
+const CARDIOS={
+ course5k:{t:["Course — premier 5 km","الجري — أول 5 كلم"],met:8.5,
+  n:["Debutant, trois sorties par semaine pendant huit semaines. On alterne marche et course au debut : c'est ce qui evite les blessures, pas un manque d'ambition.",
+     "للمبتدئين، ثلاث جلسات أسبوعياً لمدة ثمانية أسابيع. نبدأ بالتناوب بين المشي والجري: هذا ما يمنع الإصابات، وليس نقصاً في الطموح."],
+  seances:[
+   {t:["Alternance","تناوب"],blocs:[["Marche d'echauffement","5 min"],["8 x (1 min course / 2 min marche)","24 min"],["Marche de retour au calme","5 min"]]},
+   {t:["Continu progressif","متواصل تدريجي"],blocs:[["Marche d'echauffement","5 min"],["Course lente sans s'arreter","15 min"],["Marche de retour au calme","5 min"]]},
+   {t:["Endurance","تحمّل"],blocs:[["Marche d'echauffement","5 min"],["Course en aisance respiratoire","20-25 min"],["Marche de retour au calme","5 min"]]}]},
+
+ courseFond:{t:["Course — endurance et fractionne","الجري — تحمّل وتقطيع"],met:10,
+  n:["Intermediaire, deja capable de courir 30 minutes. Quatre-vingts pour cent du volume doit rester en allure facile : le fractionne ne marche que s'il est rare.",
+     "للمستوى المتوسط، لمن يستطيع الجري 30 دقيقة. ثمانون بالمئة من الحجم يبقى بوتيرة سهلة: التقطيع لا ينفع إلا إذا كان نادراً."],
+  seances:[
+   {t:["Sortie longue","جلسة طويلة"],blocs:[["Endurance fondamentale, tu dois pouvoir parler","45-70 min"]]},
+   {t:["Fractionne court","تقطيع قصير"],blocs:[["Echauffement en trot","15 min"],["10 x (400 m vite / 1 min trot)","25 min"],["Retour au calme","10 min"]]},
+   {t:["Seuil","عتبة"],blocs:[["Echauffement","15 min"],["2 x 10 min allure soutenue, 3 min trot entre","23 min"],["Retour au calme","10 min"]]}]},
+
+ velo:{t:["Velo — route ou home-trainer","دراجة — طريق أو ثابتة"],met:8,
+  n:["Sans impact sur les articulations, donc tolerant sur le volume. Surveille la cadence autant que la vitesse : 85 a 95 tours par minute protegent les genoux.",
+     "بدون صدمات على المفاصل، لذا يحتمل حجماً أكبر. راقب الإيقاع بقدر السرعة: من 85 إلى 95 دورة في الدقيقة تحمي الركبتين."],
+  seances:[
+   {t:["Endurance","تحمّل"],blocs:[["Allure conversation, cadence 85-95 tr/min","60-120 min"]]},
+   {t:["Force-velocite","قوة وسرعة"],blocs:[["Echauffement","20 min"],["6 x (3 min a 60 tr/min en force / 3 min souple)","36 min"],["Retour au calme","15 min"]]},
+   {t:["Intervalles","فترات"],blocs:[["Echauffement","20 min"],["5 x (4 min soutenu / 4 min souple)","40 min"],["Retour au calme","10 min"]]}]},
+
+ elliptique:{t:["Velo elliptique","الدراجة الإهليلجية"],met:5.5,
+  n:["Mouvement complet et sans choc, pratique pour ajouter du volume sans fatiguer les jambes avant une seance de jambes.",
+     "حركة كاملة وبدون صدمات، مفيدة لإضافة حجم دون إرهاق الساقين قبل حصة الأرجل."],
+  seances:[
+   {t:["Continu","متواصل"],blocs:[["Echauffement resistance faible","10 min"],["Resistance moyenne, 55-65 pas/min","30 min"],["Retour au calme","5 min"]]},
+   {t:["Pyramide","هرم"],blocs:[["Echauffement","10 min"],["Resistance 4, 6, 8, 10, 8, 6, 4 — 3 min chacune","21 min"],["Retour au calme","5 min"]]},
+   {t:["Fractionne court","تقطيع قصير"],blocs:[["Echauffement","10 min"],["12 x (30 s intense / 60 s souple)","18 min"],["Retour au calme","8 min"]]}]},
+
+ natation:{t:["Natation","السباحة"],met:7,
+  n:["La technique prime sur l'effort : nager mal plus longtemps ne fait pas progresser. Compte en metres, pas en minutes.",
+     "التقنية أهم من المجهود: السباحة بشكل خاطئ لوقت أطول لا تحسّن شيئاً. احسب بالأمتار لا بالدقائق."],
+  seances:[
+   {t:["Technique","تقنية"],blocs:[["Echauffement souple","200 m"],["8 x 50 m educatifs, 20 s de repos","400 m"],["Nage souple","200 m"]]},
+   {t:["Endurance","تحمّل"],blocs:[["Echauffement","300 m"],["Nage continue sans arret","800-1500 m"],["Nage souple","200 m"]]},
+   {t:["Fractionne","تقطيع"],blocs:[["Echauffement","300 m"],["10 x 50 m vite, 30 s de repos","500 m"],["Nage souple","200 m"]]}]},
+
+ rameur:{t:["Rameur","آلة التجديف"],met:7,
+  n:["Quatre-vingts pour cent de la poussee vient des jambes. L'ordre est jambes, tronc, bras a la traction, puis l'inverse au retour.",
+     "ثمانون بالمئة من الدفع يأتي من الساقين. الترتيب: ساقان، جذع، ذراعان في السحب، ثم العكس في العودة."],
+  seances:[
+   {t:["Endurance","تحمّل"],blocs:[["Echauffement","10 min"],["22-24 coups par minute","25 min"],["Retour au calme","5 min"]]},
+   {t:["Intervalles","فترات"],blocs:[["Echauffement","10 min"],["8 x (500 m / 2 min de repos)","30 min"],["Retour au calme","8 min"]]}]},
+
+ marche:{t:["Marche rapide","المشي السريع"],met:4.3,
+  n:["Le moyen le plus sous-estime d'augmenter la depense sans toucher a la recuperation. Compatible avec n'importe quel programme de musculation.",
+     "أكثر الوسائل استهانةً لزيادة الصرف دون المساس بالاستشفاء. متوافق مع أي برنامج لكمال الأجسام."],
+  seances:[
+   {t:["Quotidienne","يومي"],blocs:[["Allure 5 a 6 km/h, sans pause","45-60 min"]]},
+   {t:["Cotes","منحدرات"],blocs:[["Echauffement a plat","10 min"],["8 x (2 min en montee / 2 min descente)","32 min"],["Retour au calme","10 min"]]}]},
+
+ hiit:{t:["HIIT sans materiel","هيت بدون معدات"],met:8,
+  n:["Court et exigeant, deux fois par semaine au maximum. A placer loin des seances de jambes, jamais la veille.",
+     "قصير ومتطلب، مرتان أسبوعياً كحد أقصى. ضعه بعيداً عن حصص الأرجل، وليس في اليوم السابق لها أبداً."],
+  seances:[
+   {t:["Tabata","تاباتا"],blocs:[["Echauffement articulaire","5 min"],["4 blocs de 8 x (20 s effort max / 10 s repos), 1 min entre blocs","19 min"],["Retour au calme","5 min"]]},
+   {t:["Circuit","دائري"],blocs:[["Echauffement","5 min"],["4 tours : burpees, montees de genoux, fentes sautees, gainage — 40 s chacun, 1 min entre tours","15 min"],["Retour au calme","5 min"]]}]}
+};
+
+const AR_EX={
+"Squat":"سكوات","Developpe couche":"بنش برس","Rowing barre":"تجديف بالبار","Developpe militaire":"ضغط كتف عسكري",
+"Curl barre":"مرجحة بايسبس بالبار","Gainage planche":"بلانك","Souleve de terre roumain":"رفعة ميتة رومانية",
+"Traction ou tirage vertical":"عقلة أو سحب علوي","Developpe incline halteres":"ضغط مائل بالدمبل",
+"Fentes marchees":"طعنات مشي","Extension triceps poulie":"تمديد ترايسبس بالكابل","Releve de bassin":"رفع الحوض",
+"Souleve de terre":"رفعة ميتة","Dips ou developpe couche prise serree":"متوازي أو بنش بقبضة ضيقة",
+"Tirage horizontal":"سحب أفقي","Presse a cuisses":"ضغط الأرجل","Elevations laterales":"رفرفة جانبية",
+"Mollets debout":"سمانة واقفاً","Traction lestee":"عقلة بوزن إضافي","Curl barre EZ":"مرجحة ببار EZ",
+"Barre au front":"سكل كراشر","Leg curl":"ثني الساقين","Mollets assis":"سمانة جالساً","Gainage lateral":"بلانك جانبي",
+"Tirage vertical prise large":"سحب علوي بقبضة واسعة","Ecartes poulie":"تفتيح بالكابل",
+"Curl incline + extension poulie":"مرجحة مائلة + تمديد بالكابل","Fentes bulgares":"طعنات بلغارية",
+"Leg extension":"تمديد الساقين","Souleve de terre jambes tendues":"رفعة ميتة بأرجل ممدودة",
+"Hip thrust":"دفع الحوض","Releve de jambes suspendu":"رفع الأرجل معلقاً",
+"Developpe militaire halteres":"ضغط كتف بالدمبل","Developpe incline":"ضغط مائل","Dips lestes":"متوازي بوزن إضافي",
+"Extension triceps corde":"تمديد ترايسبس بالحبل","Traction":"عقلة","Tirage horizontal prise serree":"سحب أفقي بقبضة ضيقة",
+"Curl marteau":"مرجحة مطرقة"
+};
+
+/* ============================ MOUVEMENTS ============================ */
+/* Chaque motif : une silhouette de profil animee entre deux poses.
+   corps = cheville, genou, hanche, epaule. bras = epaule, coude, main (ou tibia selon le motif).
+   jambe2 = seconde jambe. plaque = barre ou haltere vue de profil. fixe = decor immobile. */
+const MOTIFS={
+squat:{t:["Squat","سكوات"],
+  cue:["Barre sur les trapezes, pieds largeur d'epaules. Pousse les hanches en arriere et descends jusqu'a ce que la cuisse passe sous l'horizontale, dos gaine, genoux dans l'axe des pieds.",
+       "البار على عضلات الترابيس، القدمان بعرض الكتفين. ادفع الوركين للخلف وانزل حتى يتجاوز الفخذ الخط الأفقي، مع شد الظهر وإبقاء الركبتين في محور القدمين."],
+  corps:["52,110 54,86 56,62 56,34","52,110 68,88 46,80 58,54"],
+  bras:["56,34 48,40 42,36","58,54 50,60 44,56"], plaque:[[48,36],[50,56]]},
+sdt:{t:["Souleve de terre","الرفعة الميتة"],
+  cue:["Barre contre les tibias, dos plat. Pousse dans le sol avec les jambes puis verrouille les hanches. Ne tire jamais avec le bas du dos arrondi.",
+       "البار ملاصق للساقين، الظهر مستقيم. ادفع الأرض برجليك ثم أقفل الوركين. لا ترفع أبداً وظهرك الأسفل مقوّس."],
+  corps:["54,110 55,86 56,62 56,34","54,110 60,88 44,76 70,62"],
+  bras:["56,34 58,52 60,70","70,62 70,80 70,98"], plaque:[[60,70],[70,98]]},
+couche:{t:["Developpe couche","البنش برس"],
+  cue:["Omoplates serrees, pieds au sol. Descends la barre au bas des pectoraux en controlant, coudes a 45 degres du corps, puis pousse.",
+       "اضغط لوحي الكتف، القدمان على الأرض. أنزل البار إلى أسفل الصدر بتحكم، والمرفقان بزاوية 45 درجة عن الجسم، ثم ادفع."],
+  corps:["36,110 46,92 62,78 88,78","36,110 46,92 62,78 88,78"],
+  bras:["88,78 88,62 88,46","88,78 99,66 88,67"], plaque:[[88,46],[88,67]],
+  fixe:'<rect x="54" y="81" width="56" height="6" rx="3"/><line x1="62" y1="87" x2="62" y2="110"/><line x1="102" y1="87" x2="102" y2="110"/>'},
+militaire:{t:["Developpe epaules","ضغط الأكتاف"],
+  cue:["Debout, abdos serres, fessiers contractes. Pousse la barre a la verticale au-dessus de la tete sans cambrer le bas du dos.",
+       "واقفاً، شدّ البطن وانقبض بالمقعدة. ادفع البار عمودياً فوق الرأس دون تقويس أسفل الظهر."],
+  corps:["56,110 57,86 58,62 58,34","56,110 57,86 58,62 58,34"],
+  bras:["58,34 48,46 62,46","58,34 58,20 58,8"], plaque:[[62,46],[58,6]]},
+rowing:{t:["Rowing / tirage horizontal","التجديف / السحب الأفقي"],
+  cue:["Buste penche vers l'avant, dos plat. Tire les coudes vers l'arriere en serrant les omoplates, la barre vient au nombril.",
+       "الجذع مائل للأمام والظهر مستقيم. اسحب المرفقين للخلف مع ضغط لوحي الكتف، ويصل البار إلى السرة."],
+  corps:["50,110 54,88 46,74 76,60","50,110 54,88 46,74 76,60"],
+  bras:["76,60 76,76 76,92","76,60 62,72 70,74"], plaque:[[76,92],[70,74]]},
+traction:{t:["Traction / tirage vertical","العقلة / السحب العلوي"],
+  cue:["Suspension bras tendus. Tire les coudes vers le bas et l'arriere jusqu'a passer le menton au-dessus de la barre, sans balancer.",
+       "تعلّق والذراعان ممدودتان. اسحب المرفقين للأسفل والخلف حتى يتجاوز الذقن البار، دون تأرجح."],
+  corps:["60,96 60,80 60,64 60,44","60,78 60,62 60,46 60,26"],
+  bras:["60,44 60,30 60,16","60,26 48,21 60,16"],
+  fixe:'<line x1="32" y1="16" x2="88" y2="16"/>'},
+dips:{t:["Dips","المتوازي"],
+  cue:["Bras tendus sur les barres. Descends jusqu'a ce que l'epaule passe sous le coude, buste legerement penche pour les pectoraux, droit pour les triceps.",
+       "الذراعان ممدودتان على المتوازي. انزل حتى يمر الكتف تحت المرفق، مع ميل الجذع قليلاً للصدر، أو استقامته للترايسبس."],
+  corps:["52,92 58,80 62,66 62,44","52,108 58,96 62,82 62,60"],
+  bras:["62,44 66,46 70,48","62,60 70,56 70,48"],
+  fixe:'<line x1="70" y1="48" x2="96" y2="48"/>'},
+fente:{t:["Fentes","الطعنات"],
+  cue:["Grand pas en avant. Descends a la verticale jusqu'a ce que le genou arriere frole le sol, le genou avant reste au-dessus de la cheville.",
+       "خطوة واسعة للأمام. انزل عمودياً حتى تكاد الركبة الخلفية تلامس الأرض، مع بقاء الركبة الأمامية فوق الكاحل."],
+  corps:["46,110 50,88 56,64 56,36","78,110 78,86 56,80 56,52"],
+  jambe2:["46,110 48,90 56,64","32,108 44,102 56,80"],
+  bras:["56,36 54,54 54,70","56,52 54,70 54,86"]},
+presse:{inverse:true,t:["Presse a cuisses","ضغط الأرجل"],
+  cue:["Dos et bassin colles au dossier. Descends jusqu'a 90 degres au genou sans decoller le bas du dos, puis pousse sans verrouiller sechement.",
+       "الظهر والحوض ملتصقان بالمسند. انزل حتى 90 درجة في الركبة دون رفع أسفل الظهر، ثم ادفع دون إقفال حاد."],
+  corps:["34,62 48,76 74,66 94,58","34,62 48,76 68,48 78,66"],
+  bras:["34,62 40,74 50,78","34,62 40,74 50,78"], plaque:[[98,56],[82,66]],
+  fixe:'<line x1="26" y1="46" x2="44" y2="78"/><line x1="44" y1="78" x2="62" y2="82"/>'},
+curl:{t:["Curl biceps","مرجحة البايسبس"],
+  cue:["Coudes colles au corps, ils ne partent pas vers l'avant. Monte la charge par la flexion du coude seule, et retiens la descente.",
+       "المرفقان ملتصقان بالجسم ولا يتقدمان. ارفع الوزن بثني المرفق فقط، وتحكم في النزول."],
+  corps:["56,110 57,86 58,62 58,34","56,110 57,86 58,62 58,34"],
+  bras:["58,34 58,52 62,70","58,34 58,52 50,38"], plaque:[[62,70],[50,38]]},
+triceps:{t:["Extension triceps","تمديد الترايسبس"],
+  cue:["Coudes fixes le long du corps. Seul l'avant-bras bouge : tends completement en bas et serre le triceps une seconde.",
+       "المرفقان ثابتان بجانب الجسم. الساعد وحده يتحرك: مدّ بالكامل للأسفل واضغط الترايسبس ثانية واحدة."],
+  corps:["56,110 57,86 58,62 58,34","56,110 57,86 58,62 58,34"],
+  bras:["58,34 58,52 50,40","58,34 58,52 56,70"],
+  cable:[58,10]},
+laterale:{t:["Elevations laterales","الرفرفة الجانبية"],
+  cue:["Legere flexion du coude, epaules basses. Monte jusqu'a la hauteur des epaules en menant par le coude, sans elan du buste.",
+       "ثنية خفيفة في المرفق والكتفان منخفضان. ارفع حتى مستوى الكتفين بقيادة المرفق، دون دفع بالجذع."],
+  corps:["56,110 57,86 58,62 58,34","56,110 57,86 58,62 58,34"],
+  bras:["58,34 60,50 62,66","58,34 72,35 86,34"], plaque:[[62,66],[86,34]]},
+ecarte:{t:["Ecartes / pec deck","التفتيح"],
+  cue:["Coudes legerement flechis et figes. Ouvre jusqu'a sentir l'etirement du pectoral, puis referme en rapprochant les mains devant toi.",
+       "المرفقان مثنيان قليلاً وثابتان. افتح حتى تشعر بتمدد الصدر، ثم أغلق بتقريب اليدين أمامك."],
+  corps:["52,110 54,86 56,62 56,38","52,110 54,86 56,62 56,38"],
+  bras:["56,38 76,30 94,24","56,38 76,42 94,48"],
+  cable:[112,18]},
+legcurl:{inverse:true,t:["Leg curl","ثني الساقين"],
+  cue:["Allonge, bassin colle au banc. Amene les talons vers les fessiers par la seule flexion du genou, sans decoller les hanches.",
+       "مستلقياً والحوض ملتصق بالمقعد. قرّب الكعبين من المقعدة بثني الركبة فقط، دون رفع الوركين."],
+  corps:["34,74 50,75 62,76 78,76","34,74 50,75 62,76 78,76"],
+  bras:["78,76 88,76 98,76","78,76 82,64 86,52"], plaque:[[98,76],[86,52]],
+  fixe:'<rect x="28" y="79" width="54" height="6" rx="3"/>'},
+legext:{inverse:true,t:["Leg extension","تمديد الساقين"],
+  cue:["Assis, dos cale. Tends les jambes jusqu'a la contraction complete du quadriceps, marque un temps, puis reviens en controlant.",
+       "جالساً والظهر مسنود. مدّ الساقين حتى انقباض الفخذ الكامل، توقّف لحظة، ثم عُد بتحكم."],
+  corps:["46,50 50,74 72,74 72,74","46,50 50,74 72,74 72,74"],
+  bras:["72,74 72,86 72,98","72,74 84,72 96,70"], plaque:[[72,98],[96,70]],
+  fixe:'<rect x="36" y="74" width="38" height="6" rx="3"/><line x1="40" y1="46" x2="40" y2="76"/>'},
+mollet:{t:["Mollets","السمانة"],
+  cue:["Avant-pied sur la marche, talon dans le vide. Descends le talon jusqu'a l'etirement, puis monte le plus haut possible et tiens une seconde.",
+       "مقدمة القدم على الدرجة والكعب في الفراغ. أنزل الكعب حتى التمدد، ثم ارتفع إلى أقصى حد وابقَ ثانية."],
+  corps:["56,110 57,86 58,62 58,34","60,102 58,79 58,55 58,27"],
+  bras:["58,34 58,52 58,70","58,27 58,45 58,63"],
+  fixe:'<rect x="40" y="104" width="34" height="7" rx="2"/>'},
+hipthrust:{inverse:true,t:["Hip thrust / releve de bassin","دفع الحوض"],
+  cue:["Haut du dos appuye sur le banc, menton rentre. Monte les hanches jusqu'a l'alignement genou-hanche-epaule et serre les fessiers en haut.",
+       "أعلى الظهر مسنود على المقعد والذقن للداخل. ارفع الوركين حتى استقامة الركبة والورك والكتف، واضغط المقعدة في الأعلى."],
+  corps:["40,62 56,86 76,88 88,110","40,62 62,64 80,74 88,110"],
+  bras:["40,62 46,74 54,78","40,62 50,72 58,70"], plaque:[[56,84],[62,62]],
+  fixe:'<rect x="20" y="64" width="26" height="6" rx="3"/><line x1="26" y1="70" x2="26" y2="92"/>'},
+gainage:{t:["Gainage planche","البلانك"],
+  cue:["Appui sur les avant-bras, corps en ligne droite de la tete aux talons. Serre abdos et fessiers, respire, ne laisse pas le bassin tomber.",
+       "الارتكاز على الساعدين والجسم على خط مستقيم من الرأس إلى الكعبين. شدّ البطن والمقعدة، تنفّس، ولا تدع الحوض يهبط."],
+  corps:["102,106 86,96 68,86 46,78","102,106 86,97 68,88 46,79"],
+  bras:["46,78 40,92 28,98","46,79 40,93 28,99"]},
+jambes:{t:["Releve de jambes suspendu","رفع الأرجل معلقاً"],
+  cue:["Suspendu, epaules actives. Enroule le bassin et monte les jambes sans balancier ; la descente lente est la partie qui compte.",
+       "معلّقاً والكتفان مشدودان. لفّ الحوض وارفع الساقين دون تأرجح؛ النزول البطيء هو الجزء المهم."],
+  corps:["60,112 60,92 60,70 60,42","96,62 80,70 60,70 60,42"],
+  bras:["60,42 60,29 60,16","60,42 60,29 60,16"],
+  fixe:'<line x1="32" y1="16" x2="88" y2="16"/>'}
+};
+/* quel motif pour quel exercice */
+const EXO_MOTIF={
+"Squat":"squat","Presse a cuisses":"presse","Fentes marchees":"fente","Fentes bulgares":"fente",
+"Souleve de terre":"sdt","Souleve de terre roumain":"sdt","Souleve de terre jambes tendues":"sdt",
+"Developpe couche":"couche","Developpe incline halteres":"couche","Developpe incline":"couche",
+"Dips ou developpe couche prise serree":"dips","Dips lestes":"dips",
+"Developpe militaire":"militaire","Developpe militaire halteres":"militaire",
+"Rowing barre":"rowing","Tirage horizontal":"rowing","Tirage horizontal prise serree":"rowing",
+"Traction":"traction","Traction lestee":"traction","Traction ou tirage vertical":"traction",
+"Tirage vertical prise large":"traction",
+"Curl barre":"curl","Curl barre EZ":"curl","Curl marteau":"curl","Curl incline + extension poulie":"curl",
+"Extension triceps poulie":"triceps","Extension triceps corde":"triceps","Barre au front":"triceps",
+"Elevations laterales":"laterale","Ecartes poulie":"ecarte",
+"Leg curl":"legcurl","Leg extension":"legext",
+"Mollets debout":"mollet","Mollets assis":"mollet",
+"Hip thrust":"hipthrust","Releve de bassin":"hipthrust",
+"Gainage planche":"gainage","Gainage lateral":"gainage","Releve de jambes suspendu":"jambes"
+};
+const DUREE="2.8s";
+function anim(attr,val){
+  return `<animate attributeName="${attr}" dur="${DUREE}" repeatCount="indefinite" calcMode="spline"
+    keyTimes="0;0.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="${val[0]};${val[1]};${val[0]}"/>`;
+}
+/* La tete prolonge l'axe du tronc : elle suit donc l'inclinaison du buste
+   au lieu d'etre posee a la main pose par pose. */
+function tete(corps,inverse){
+  const p=corps.trim().split(/\s+/).map(s=>s.split(",").map(Number));
+  const ep = inverse?p[0]:p[p.length-1], vo = inverse?p[1]:p[p.length-2];
+  const dx=ep[0]-vo[0], dy=ep[1]-vo[1], d=Math.hypot(dx,dy)||1;
+  return [ep[0]+dx/d*11.5, ep[1]+dy/d*11.5];
+}
+/* le buste (hanche-epaule) est redessine plus epais pour se detacher des membres */
+function tronc(corps,inverse){
+  return corps.map(p=>{const a=p.trim().split(/\s+/); return (inverse?a.slice(0,2):a.slice(-2)).join(" ")});
+}
+function figure(cle,grand){
+  const m=MOTIFS[cle]; if(!m) return "";
+  const ligne=(cls,v)=>`<polyline class="${cls}" points="${v[0]}" fill="none">${anim("points",v)}</polyline>`;
+  const tA=tete(m.corps[0],m.inverse), tB=tete(m.corps[1],m.inverse);
+  const plaque = m.plaque ? `<circle class="pl" cx="${m.plaque[0][0]}" cy="${m.plaque[0][1]}" r="7.5">
+      ${anim("cx",[m.plaque[0][0],m.plaque[1][0]])}${anim("cy",[m.plaque[0][1],m.plaque[1][1]])}</circle>` : "";
+  /* le cable relie un point fixe a la main, c'est-a-dire au dernier point du bras */
+  const a=m.bras[0].trim().split(/\s+/).pop().split(","), b=m.bras[1].trim().split(/\s+/).pop().split(",");
+  const cable = m.cable ? `<line class="cb" x1="${m.cable[0]}" y1="${m.cable[1]}" x2="${a[0]}" y2="${a[1]}">
+      ${anim("x2",[a[0],b[0]])}${anim("y2",[a[1],b[1]])}</line>` : "";
+  return `<svg class="mv${grand?" gr":""}" viewBox="0 0 120 120" role="img" aria-label="${esc(L(m.t))}">
+    <line class="sol" x1="8" y1="112" x2="112" y2="112"/>
+    <g class="fx">${m.fixe||""}${cable}</g>
+    ${m.jambe2?ligne("co j2",m.jambe2):""}
+    ${ligne("tr",tronc(m.corps,m.inverse))}
+    ${ligne("co",m.corps)}
+    ${ligne("br",m.bras)}
+    <circle class="tt" cx="${tA[0].toFixed(1)}" cy="${tA[1].toFixed(1)}" r="7.5">
+      ${anim("cx",[tA[0].toFixed(1),tB[0].toFixed(1)])}${anim("cy",[tA[1].toFixed(1),tB[1].toFixed(1)])}</circle>
+    ${plaque}
+  </svg>`;
+}
+
+/* ============================ TEXTES ============================ */
+const T={
+poids:["Poids","الوزن"],cible:["Cible","الهدف"],kcal:["kcal","سعرة"],kg:["kg","كغ"],g:["g","غ"],
+sync_nuage:["sauvegarde en ligne","حفظ عبر الإنترنت"],
+sync_nuage_t:["Tes donnees sont enregistrees et te suivent d'un appareil a l'autre.","بياناتك محفوظة وتنتقل معك من جهاز لآخر."],
+sync_appareil:["sauvegarde sur l'appareil","محفوظ على الجهاز"],
+sync_appareil_t:["Tes donnees sont enregistrees sur cet appareil et restent disponibles hors connexion.","بياناتك محفوظة على هذا الجهاز وتبقى متاحة بدون اتصال."],
+sync_aucun:["non sauvegarde","غير محفوظ"],
+sync_aucun_t:["Ce navigateur bloque le stockage : tes donnees seront perdues en fermant la page.","هذا المتصفح يمنع التخزين: ستفقد بياناتك عند إغلاق الصفحة."],
+tab_profil:["Profil & besoins","الملف والاحتياجات"],tab_poids:["Suivi du poids","متابعة الوزن"],
+tab_nutrition:["Journal du jour","يوميات اليوم"],tab_base:["Base d'aliments","قاعدة الأغذية"],tab_entr:["Entrainement","التمارين"],
+etape:["Etape","الخطوة"],
+p_h1:["Tes besoins caloriques","احتياجاتك من السعرات"],
+p_lede:["Formule de Mifflin-St Jeor pour le metabolisme de base, puis facteur d'activite et ajustement selon l'objectif.",
+        "معادلة ميفلين-سانت جور لحساب الأيض الأساسي، ثم معامل النشاط وتعديل حسب الهدف."],
+p_exemple:["Les valeurs ci-dessous sont un exemple — remplace-les par les tiennes.","القيم أدناه مجرد مثال — غيّرها بقيمك أنت."],
+sexe:["Sexe","الجنس"],homme:["Homme","ذكر"],femme:["Femme","أنثى"],age:["Age","العمر"],
+taille:["Taille (cm)","الطول (سم)"],poids_actuel:["Poids actuel (kg)","الوزن الحالي (كغ)"],poids_vise:["Poids vise (kg)","الوزن المستهدف (كغ)"],
+activite:["Niveau d'activite","مستوى النشاط"],objectif:["Objectif","الهدف"],rythme:["Rythme","الوتيرة"],
+prot_kg:["Proteines (g / kg)","البروتين (غ / كغ)"],lip_kg:["Lipides (g / kg)","الدهون (غ / كغ)"],
+p_reperes:["Reperes en musculation : 1,6 a 2,2 g de proteines par kg, et jamais moins de 0,7 g de lipides par kg pour la production hormonale. Les glucides remplissent le reste du budget.",
+           "مرجع في كمال الأجسام: من 1.6 إلى 2.2 غ بروتين لكل كغ، ولا تنزل أبداً تحت 0.7 غ دهون لكل كغ للحفاظ على إنتاج الهرمونات. الكربوهيدرات تملأ ما تبقى."],
+bmr:["Metabolisme de base","الأيض الأساسي"],tdee:["Depense totale","إجمالي الحرق اليومي"],
+cible_jour:["Ta cible quotidienne","هدفك اليومي"],
+bmr_x:["Ce que ton corps brule au repos complet, rien que pour te maintenir en vie : cœur, cerveau, respiration, temperature. Tu depenses ca meme en restant couche toute la journee. Ne mange jamais en dessous.",
+       "ما يحرقه جسمك في راحة تامة، لمجرد إبقائك حياً: القلب والدماغ والتنفس وحرارة الجسم. تحرق هذا القدر حتى لو بقيت مستلقياً طوال اليوم. لا تأكل أبداً أقل منه."],
+tdee_x:["Ton metabolisme de base multiplie par ton niveau d'activite. C'est le total que tu brules sur une journee normale, entrainement compris. Manger exactement ca te maintient au meme poids.",
+        "أيضك الأساسي مضروباً في مستوى نشاطك. هذا ما تحرقه فعلاً في يوم عادي، بما في ذلك التمرين. أكل هذا القدر بالضبط يُبقي وزنك ثابتاً."],
+cible_x:["Ta depense totale ajustee a ton objectif : en dessous pour puiser dans les reserves, au-dessus pour construire du muscle. C'est le seul chiffre a viser chaque jour dans le journal.",
+         "حرقك اليومي معدَّلاً حسب هدفك: أقل منه لتسحب من المخزون، أكثر منه لتبني العضل. هذا هو الرقم الوحيد الذي تستهدفه كل يوم في اليوميات."],
+glu_bas:["Glucides trop bas","الكربوهيدرات منخفضة جداً"],
+glu_bas_t:["Avec ce deficit, tes objectifs de proteines et de lipides mangent presque tout le budget. Baisse les lipides vers 0,7 g/kg, ou choisis un rythme plus doux.",
+           "مع هذا العجز، البروتين والدهون يستهلكان تقريباً كل الميزانية. أنزل الدهون إلى 0.7 غ/كغ، أو اختر وتيرة أهدأ."],
+macros:["Repartition des macros","توزيع الماكروز"],
+prot:["Proteines","بروتين"],gluc:["Glucides","كربوهيدرات"],lip:["Lipides","دهون"],
+eau:["Eau","الماء"],fibres:["Fibres","الألياف"],rythme_attendu:["Rythme attendu","الوتيرة المتوقعة"],
+kg_sem:["kg/sem","كغ/أسبوع"],
+assiette:["Du plan a l'assiette","من الخطة إلى الطبق"],
+repartition:["Repartition indicative de tes","توزيع تقريبي لـ"],
+nb_prises:["Prises par jour","وجبات في اليوم"],
+repas:["Repas","الوجبة"],prot_c:["Prot.","بروتين"],gluc_c:["Gluc.","كربو"],lip_c:["Lip.","دهون"],
+assiette_h:["Une trame indicative. Decale les glucides vers le repas qui precede ou suit ta seance si tu t'entraines toujours au meme moment.",
+            "إطار تقريبي. حرّك الكربوهيدرات نحو الوجبة التي تسبق أو تلي حصتك إذا كنت تتمرن في نفس الوقت دائماً."],
+disclaimer:["Ces chiffres sont une estimation statistique, pas une mesure. Le vrai reglage se fait sur la balance : garde la cible deux a trois semaines, regarde la tendance dans l'onglet Suivi du poids, puis ajuste de 100 a 200 kcal. Ce n'est pas un avis medical.",
+            "هذه الأرقام تقدير إحصائي وليست قياساً. الضبط الحقيقي يتم على الميزان: التزم بالهدف أسبوعين إلى ثلاثة، راقب المنحى في تبويب متابعة الوزن، ثم عدّل بـ 100 إلى 200 سعرة. هذه ليست استشارة طبية."],
+w_lede:["Pese-toi le matin a jeun, apres les toilettes, toujours dans les memes conditions. Seule la moyenne sur 7 jours compte : au jour le jour tu mesures surtout de l'eau.",
+        "زِن نفسك صباحاً على معدة فارغة، بعد دخول الحمام، وفي نفس الظروف دائماً. المهم هو معدل 7 أيام: يوماً بيوم أنت تقيس الماء أكثر من أي شيء."],
+date:["Date","التاريخ"],poids_kg:["Poids (kg)","الوزن (كغ)"],enreg_pesee:["Enregistrer la pesee","سجّل الوزن"],
+w_vide_t:["Pas encore de courbe","لا يوجد منحنى بعد"],
+w_vide:["Enregistre au moins deux pesees : la courbe, la moyenne lissee et la tendance hebdomadaire apparaitront ici.",
+        "سجّل وزنين على الأقل: سيظهر هنا المنحنى والمعدل المنعّم والمنحى الأسبوعي."],
+derniere_pesee:["Derniere pesee","آخر وزن"],aucune_pesee:["Aucune pesee","لا يوجد وزن مسجل"],
+moy7:["Moyenne lissee 7 jours","المعدل المنعّم على 7 أيام"],
+tendance_sur:["Tendance sur","المنحى على"],jours:["jours","أيام"],sem:["sem.","أسبوع"],
+min5j:["Il faut 5 jours d'ecart minimum","يلزم فارق 5 أيام على الأقل"],
+pour_atteindre:["Pour atteindre","للوصول إلى"],a_ce_rythme:["a ce rythme","بهذه الوتيرة"],
+pas_vers:["La tendance ne va pas vers","المنحى لا يتجه نحو"],
+variation:["Variation","الفرق"],
+ok_fourchette:["C'est dans la bonne fourchette : ne change rien.","أنت في النطاق الصحيح: لا تغيّر شيئاً."],
+tu_avances:["Tu avances a","أنت تتقدم بـ"],pour_cible:["pour une cible de","والهدف هو"],
+tendance_reelle:["Ta tendance reelle","منحاك الفعلي"],est:["est","هو"],
+au_dessus:["au-dessus de la cible","أعلى من الهدف"],en_dessous:["en dessous de la cible","أقل من الهدف"],
+retire:["Retire environ","اخفض حوالي"],remets:["Remets environ","أعد حوالي"],ajoute:["Ajoute environ","أضف حوالي"],
+par_jour:["kcal par jour.","سعرة يومياً."],
+ou_cardio:["ou ajoute du cardio leger.","أو أضف كارديو خفيفاً."],
+prend_vite:["Tu prends plus vite que prevu : une partie sera de la graisse.","أنت تزيد أسرع مما ينبغي: جزء من الزيادة سيكون دهوناً."],
+perd_vite:["Tu perds plus vite que prevu — risque de perdre du muscle.","أنت تفقد أسرع مما ينبغي — خطر فقدان العضل."],
+leg_moy:["moyenne lissee 7 jours","المعدل المنعّم 7 أيام"],leg_brut:["pesees brutes","الأوزان الخام"],
+aujourdhui:["Aujourd'hui","اليوم"],
+sur:["sur","من"],restantes:["kcal restantes","سعرة متبقية"],au_dela:["kcal au-dessus","سعرة فوق الهدف"],
+ajouter_aliment:["Ajouter un aliment","أضف طعاماً"],
+chercher_dans:["Rechercher dans","ابحث ضمن"],aliments_m:["aliments","صنفاً"],
+categorie:["Categorie","الفئة"],toutes:["Toutes","الكل"],
+aucun_match:["Aucun aliment ne correspond. Tu peux en creer un dans l'onglet Base d'aliments.",
+             "لا يوجد صنف مطابق. يمكنك إنشاء واحد من تبويب قاعدة الأغذية."],
+aucun_match_court:["Aucun aliment ne correspond a cette recherche.","لا يوجد صنف مطابق لهذا البحث."],
+aliment_choisi:["Aliment choisi","الصنف المختار"],quantite:["Quantite (g)","الكمية (غ)"],
+ajouter:["Ajouter","أضف"],
+jour_vide_t:["Journee vide","يوم فارغ"],
+jour_vide:["Cherche un aliment ci-dessus, choisis la quantite en grammes et ajoute-le a un repas. Les totaux et les barres de macros se mettent a jour tout de suite.",
+           "ابحث عن صنف أعلاه، اختر الكمية بالغرام وأضفه إلى وجبة. المجاميع وأشرطة الماكروز تتحدث فوراً."],
+reference:["Reference","مرجع"],
+b_lede1:["aliments courants","صنفاً شائعاً"],b_lede2:["perso","خاص بك"],
+b_lede3:["en valeurs pour 100 g (100 ml pour les liquides). Ordres de grandeur issus des tables nutritionnelles usuelles : pour un produit emballe, l'etiquette reste plus exacte.",
+         "بالقيم لكل 100 غ (100 مل للسوائل). أرقام تقريبية مأخوذة من الجداول الغذائية المعتادة: بالنسبة لمنتج معلّب، تبقى بطاقة المنتج أدق."],
+rechercher:["Rechercher","بحث"],aliment:["Aliment","الصنف"],
+creer_aliment:["Creer un aliment","إنشاء صنف"],
+creer_h:["Pour un produit precis : recopie les valeurs pour 100 g indiquees sur l'emballage.",
+         "لمنتج معيّن: انسخ قيم 100 غ المكتوبة على العبوة."],
+nom:["Nom","الاسم"],creer:["Creer","إنشاء"],
+creer_err:["Il faut au moins un nom et une valeur en kcal.","يلزم على الأقل اسم وقيمة بالسعرات."],
+creer_ok:["ajoute a ta base.","أُضيف إلى قاعدتك."],
+perso:["perso","خاص"],
+photo:["photo","صورة"],photo_t:["Mettre ta propre photo","ضع صورتك الخاصة"],
+photo_h:["Survole une vignette et clique sur « photo » pour remplacer l'image par la tienne.",
+         "مرّر فوق الصورة المصغّرة واضغط على «صورة» لتضع صورتك مكانها."],
+photo_off:["Pour remplacer une image par la tienne, ouvre la page connecte avec le droit de modifier.",
+           "لتبديل صورة بصورتك، افتح الصفحة وأنت مسجّل الدخول مع صلاحية التعديل."],
+photo_err:["L'image n'a pas pu etre envoyee. Essaie une image plus petite.","تعذّر رفع الصورة. جرّب صورة أصغر."],
+credits:["Credits des photos","مصادر الصور"],
+e_h1:["Programmes & charges","البرامج والأوزان"],
+e_lede:["Trois trames classiques, du debutant au pratiquant avance. Le principe commun : ajoute une repetition ou un peu de charge chaque semaine sur les exercices de base, tant que la technique tient.",
+        "ثلاثة برامج كلاسيكية، من المبتدئ إلى المتقدم. المبدأ المشترك: أضف تكراراً أو قليلاً من الوزن كل أسبوع على التمارين الأساسية، ما دامت التقنية سليمة."],
+exercice:["Exercice","التمرين"],series:["Series","المجموعات"],repos:["Repos","الراحة"],dernier:["Dernier","آخر مرة"],
+noter_seance:["Noter cette seance","سجّل هذه الحصة"],noter:["Noter","تسجيل"],
+charge:["Charge (kg)","الوزن (كغ)"],reps:["Reps","التكرارات"],
+enreg_seance:["Enregistrer la seance","احفظ الحصة"],annuler:["Annuler","إلغاء"],
+noter_h:["Note la serie la plus lourde de chaque exercice. Les lignes laissees vides sont ignorees.",
+         "سجّل أثقل مجموعة لكل تمرين. الأسطر الفارغة تُتجاهل."],
+historique:["Historique des seances","سجل الحصص"],seance:["Seance","الحصة"],charges:["Charges","الأوزان"],
+hist_vide_t:["Aucune seance notee","لا توجد حصة مسجلة"],
+hist_vide:["Clique sur « Noter cette seance » dans un bloc ci-dessus pour enregistrer tes charges. La colonne « Dernier » te rappellera ensuite ou tu en etais.",
+           "اضغط على «سجّل هذه الحصة» في أحد البرامج أعلاه لحفظ أوزانك. عمود «آخر مرة» سيذكّرك بعدها أين وصلت."],
+tab_semaine:["Semaine","الأسبوع"],
+mode_aliment:["Aliment","صنف"],mode_recette:["Mes repas","وجباتي"],
+rec_vide_t:["Aucun repas enregistre","لا توجد وجبة محفوظة"],
+rec_vide:["Compose une prise dans le journal, puis touche « Enregistrer comme repas » sous son titre. Tu pourras ensuite la remettre en une seule fois, n'importe quel jour.",
+          "كوّن وجبة في اليوميات، ثم اضغط «احفظ كوجبة» تحت عنوانها. بعدها يمكنك إعادتها بضغطة واحدة في أي يوم."],
+rec_enregistrer:["Enregistrer comme repas","احفظ كوجبة"],
+rec_nom:["Nom du repas","اسم الوجبة"],
+rec_exemple:["Mon petit-dejeuner","فطوري المعتاد"],
+rec_portion:["Portions","حصص"],
+rec_cree:["enregistre. Tu le retrouveras dans « Mes repas ».","محفوظة. ستجدها في «وجباتي»."],
+sem_lede:["Prepare tes journees a l'avance avec tes repas enregistres, puis recopie une journee dans le journal en une touche. Rien ne t'oblige a tout planifier : tu peux ne remplir qu'un seul jour.",
+          "حضّر أيامك مسبقاً بوجباتك المحفوظة، ثم انسخ يوماً إلى اليوميات بضغطة واحدة. لا شيء يلزمك بالتخطيط الكامل: يمكنك ملء يوم واحد فقط."],
+sem_sans_rec_t:["Commence par un repas","ابدأ بوجبة"],
+sem_sans_rec:["La semaine s'organise avec des repas enregistres. Va dans le journal, compose une prise, et touche « Enregistrer comme repas » : elle deviendra disponible ici.",
+              "الأسبوع يُنظَّم بوجبات محفوظة. اذهب إلى اليوميات، كوّن وجبة، واضغط «احفظ كوجبة»: ستصبح متاحة هنا."],
+jour:["Jour","اليوم"],sem_ecart:["Ecart","الفرق"],
+sem_rien:["rien de prevu","لا شيء مقرر"],
+sem_appliquer:["Copier dans le journal","انسخ إلى اليوميات"],
+sem_appliquer_x:["La copie ajoute les aliments de chaque repas a la date affichee dans le journal, sans effacer ce qui s'y trouve deja.",
+                 "النسخ يضيف أصناف كل وجبة إلى التاريخ المعروض في اليوميات، دون حذف ما هو موجود."],
+sem_copie:["ajoutes au journal du","أُضيفت إلى يوميات"],
+sport_muscu:["Musculation","كمال الأجسام"],sport_cardio:["Cardio","الكارديو"],
+c_h1:["Endurance et cardio","التحمّل والكارديو"],
+c_lede:["Course, velo, elliptique, natation, rameur, marche et HIIT. Chaque seance est decoupee en phases : l'echauffement et le retour au calme ne sont pas facultatifs, ce sont eux qui rendent le travail soutenable.",
+        "جري، دراجة، إهليلجي، سباحة، تجديف، مشي وهيت. كل حصة مقسّمة إلى مراحل: الإحماء والتهدئة ليسا اختياريين، فهما ما يجعل العمل محتملاً."],
+duree:["Duree (min)","المدة (د)"],dist_km:["Distance (km)","المسافة (كلم)"],
+intensite:["Intensite","الشدة"],
+cmp_t:["Estimation contre mesure","التقدير مقابل القياس"],
+cmp_x:["Deux chiffres qui ne mesurent pas la meme chose. L'application estime la depense a partir de la duree, du type d'effort et de ton poids. La montre mesure ce qu'elle a releve pendant ses propres seances. Aucun des deux n'est la verite : la valeur retenue est leur moyenne.",
+       "رقمان لا يقيسان الشيء نفسه. التطبيق يقدّر الصرف من المدة ونوع المجهود ووزنك. الساعة تقيس ما سجّلته خلال حصصها. لا أحدهما هو الحقيقة: القيمة المعتمدة هي متوسطهما."],
+cmp_vide:["Dès que tu auras note une seance et que ta montre aura enregistre un entrainement le meme jour, la comparaison apparaitra ici.",
+          "بمجرد أن تسجّل حصة وتسجّل ساعتك تمريناً في اليوم نفسه، ستظهر المقارنة هنا."],
+cmp_estime:["Estime","مقدَّر"],cmp_mesure:["Montre","الساعة"],
+cmp_ecart:["Ecart","الفرق"],cmp_retenu:["Retenu","المعتمد"],
+cmp_biais:["Sur les journees comparables, la montre releve en moyenne","في الأيام القابلة للمقارنة، تسجّل الساعة في المتوسط"],
+cmp_bon:["Les deux methodes s'accordent : l'estimation de l'application est fiable pour toi.",
+         "الطريقتان متوافقتان: تقدير التطبيق موثوق بالنسبة لك."],
+cmp_sous:["L'application sous-estime ton effort. Passe tes seances de musculation en intensite superieure.",
+          "التطبيق يقلّل من تقدير مجهودك. ارفع شدة حصص كمال الأجسام."],
+cmp_sur:["L'application surestime ton effort. Passe tes seances en intensite inferieure.",
+         "التطبيق يبالغ في تقدير مجهودك. اخفض شدة حصصك."],
+c_estim:["Depense estimee :","الصرف التقديري:"],c_pour:["pour","لـ"],c_a:["a","عند"],
+c_hist_vide:["Note une seance cardio et elle apparaitra ici, avec sa duree, sa distance et la depense estimee.",
+             "سجّل حصة كارديو وستظهر هنا، مع مدتها ومسافتها والصرف التقديري."],
+tab_sante:["Montre & sante","الساعة والصحة"],
+s_h1:["Ce que ta montre mesure","ما تقيسه ساعتك"],
+s_lede:["Calories depensees, distance, sommeil et frequence cardiaque sont lus dans l'application de sante de ton telephone. Rien n'est envoye ailleurs : les donnees restent sur l'appareil.",
+        "تُقرأ السعرات المحروقة والمسافة والنوم ونبض القلب من تطبيق الصحة في هاتفك. لا شيء يُرسل إلى الخارج: البيانات تبقى على جهازك."],
+s_absent_t:["Disponible dans l'application mobile","متاح في تطبيق الهاتف"],
+s_absent:["Cette page web ne peut pas lire ta montre : un navigateur n'a pas acces aux donnees de sante. Installe la version Android ou iPhone de Fonte & Macros, qui lit les memes donnees que celles-ci.",
+          "هذه الصفحة لا يمكنها قراءة ساعتك: المتصفح لا يصل إلى بيانات الصحة. ثبّت نسخة أندرويد أو آيفون من التطبيق، فهي تقرأ هذه البيانات نفسها."],
+s_sources:["Sources reconnues","المصادر المدعومة"],
+s_sources_x:["Sur Android, les donnees transitent par Health Connect, qui regroupe Samsung Health, Google Fit, Fitbit et Garmin. Huawei Sante passe par son propre service. Sur iPhone, tout arrive par Apple Sante, ou Huawei Sante ecrit aussi.",
+             "على أندرويد، تمر البيانات عبر Health Connect الذي يجمع Samsung Health وGoogle Fit وFitbit وGarmin. صحة هواوي تمر عبر خدمتها الخاصة. على آيفون، كل شيء يصل عبر Apple Health، حيث تكتب صحة هواوي أيضاً."],
+s_autoriser:["Autoriser la lecture","السماح بالقراءة"],
+s_autoriser_t:["Autorisation a donner","إذن مطلوب"],
+s_autoriser_x:["L'application est installee mais n'a pas encore le droit de lire tes donnees. Tu choisis precisement ce que tu partages, et tu peux le retirer a tout moment.",
+               "التطبيق مثبّت لكن لا يملك بعد إذن قراءة بياناتك. أنت تختار بالضبط ما تشاركه، ويمكنك سحبه في أي وقت."],
+diag:["Etat de la liaison","حالة الاتصال"],
+diag_installe:["installe","مثبّت"],diag_absent:["absent","غير مثبّت"],
+diag_maj:["mise a jour requise","يحتاج تحديثاً"],
+diag_autor:["Autorisations","الأذونات"],diag_ok:["accordees","ممنوحة"],
+diag_non:["non accordees","غير ممنوحة"],diag_manque:["a accorder","بحاجة للإذن"],
+diag_jours:["Journees trouvees","الأيام الموجودة"],diag_zero:["aucune","لا شيء"],
+diag_vide:["La liaison fonctionne, mais aucune application n'a encore ecrit de donnees dans Health Connect. C'est le cas typique avec une montre Huawei : voir ci-dessous.",
+           "الاتصال يعمل، لكن لم يكتب أي تطبيق بيانات في Health Connect بعد. هذه هي الحالة المعتادة مع ساعة هواوي: انظر أدناه."],
+ouvrir_hc:["Ouvrir Health Connect","افتح Health Connect"],
+installer_hc:["Installer Health Connect","ثبّت Health Connect"],
+brancher:["Brancher ta montre","وصّل ساعتك"],
+brancher_x:["La liaison n'est jamais automatique : chaque application de sante doit d'abord accepter d'ecrire dans Health Connect. Une seule fois, puis ca tourne tout seul.",
+            "الربط ليس تلقائياً أبداً: كل تطبيق صحي يجب أن يوافق أولاً على الكتابة في Health Connect. مرة واحدة فقط، ثم يعمل من تلقاء نفسه."],
+direct:["direct","مباشر"],via_relais:["via un relais","عبر وسيط"],
+hc_version:["Sur Android 14 et au-dela, Health Connect fait partie du systeme. En dessous, il s'installe depuis le Play Store. Samsung Health demande la version 6.22.5 ou plus recente.",
+            "على أندرويد 14 فما فوق، Health Connect جزء من النظام. دونها، يُثبَّت من متجر Play. ويتطلب Samsung Health الإصدار 6.22.5 أو أحدث."],
+huawei_t:["Si ta montre est une Huawei :","إذا كانت ساعتك من هواوي:"],
+huawei_x:["Huawei Sante n'ecrit pas dans Health Connect. Les deux appartiennent a des mondes separes et Huawei n'a jamais ouvert de passerelle officielle. Ce n'est pas un reglage que tu aurais manque, et aucune application ne peut lire Huawei Sante directement sans l'accord de Huawei. Le chemin qui marche aujourd'hui passe par une application relais :",
+          "تطبيق صحة هواوي لا يكتب في Health Connect. الاثنان ينتميان إلى منظومتين منفصلتين، ولم تفتح هواوي جسراً رسمياً قط. ليس إعداداً فاتك، ولا يمكن لأي تطبيق قراءة صحة هواوي مباشرة دون موافقة هواوي. الطريق الذي ينجح اليوم يمر عبر تطبيق وسيط:"],
+huawei_1:["Dans Huawei Sante, active le partage de donnees : Moi, puis Confidentialite, puis Partage de donnees.",
+          "في تطبيق صحة هواوي، فعّل مشاركة البيانات: «أنا» ثم «الخصوصية» ثم «مشاركة البيانات»."],
+huawei_2:["Installe Health Sync, une application relais payante apres une periode d'essai.",
+          "ثبّت تطبيق Health Sync، وهو تطبيق وسيط مدفوع بعد فترة تجريبية."],
+huawei_3:["Dans Health Sync, choisis Huawei Sante comme source et Health Connect comme destination, puis reviens ici et touche Actualiser.",
+          "في Health Sync، اختر صحة هواوي كمصدر وHealth Connect كوجهة، ثم عُد إلى هنا واضغط «تحديث»."],
+huawei_iphone:["Sur iPhone, rien de tout cela n'est necessaire : Huawei Sante ecrit directement dans Apple Sante.",
+               "على آيفون، لا حاجة لكل هذا: تطبيق صحة هواوي يكتب مباشرة في Apple Health."],
+s_indispo_t:["Aucune source de sante","لا يوجد مصدر صحي"],
+s_indispo:["Ton telephone n'expose aucune application de sante lisible. Sur Android, installe Health Connect depuis le Play Store, puis autorise ta montre a y ecrire.",
+           "هاتفك لا يعرض أي تطبيق صحي قابل للقراءة. على أندرويد، ثبّت Health Connect من المتجر ثم اسمح لساعتك بالكتابة فيه."],
+kcal_actives:["Calories actives","السعرات النشطة"],distance:["Distance","المسافة"],
+sommeil:["Sommeil","النوم"],fc_moy:["Freq. cardiaque moyenne","متوسط نبض القلب"],pas:["Pas","الخطوات"],
+s_rafraichir:["Actualiser","تحديث"],s_maj:["Derniere lecture","آخر قراءة"],
+s_7j:["Les sept derniers jours","آخر سبعة أيام"],
+s_rien:["Rien a afficher pour l'instant. Porte ta montre une journee, puis actualise.",
+        "لا شيء لعرضه الآن. ارتدِ ساعتك ليوماً كاملاً ثم حدّث."],
+s_dyn:["Cible calorique dynamique","هدف السعرات المتغير"],
+s_dyn_x:["Ta cible du jour devient ton metabolisme au repos plus la depense active reellement mesuree. Mets alors ton niveau d'activite sur Sedentaire dans le profil, sinon l'effort compte deux fois.",
+         "يصبح هدفك اليومي أيضك في الراحة زائد الصرف النشط المقاس فعلياً. اضبط حينها مستوى نشاطك على «خامل» في الملف، وإلا احتُسب المجهود مرتين."],
+cible_dyn_actif:["dont actif mesure","منها نشاط مقاس"],
+voir_mvt:["Voir le mouvement","شاهد الحركة"],fermer:["Fermer","إغلاق"],
+mv_meme:["Meme mouvement :","نفس الحركة:"],
+mv_aide:["Clique sur le nom d'un exercice pour voir le mouvement anime et le point technique a surveiller.",
+         "اضغط على اسم التمرين لمشاهدة الحركة متحركة والنقطة التقنية التي يجب الانتباه لها."]
+};
+
+/* ============================ ETAT ============================ */
+const DEFAUT={sexe:"h",age:30,taille:175,poids:75,cible:72,activite:"modere",objectif:"seche",rythme:"modere",protKg:2,lipKg:0.9,nbRepas:4};
+const S={lang:"fr",profil:{...DEFAUT},profilCharge:false,pesees:[],journal:{},persos:[],seances:[],photos:{},
+         jour:iso(new Date()),tab:"profil",sel:null,q:"",cat:"",db:null,uid:null,prog:"halfbody",pendPhoto:null,mv:null,
+         sante:{cibleDyn:false,jours:{},source:"",maj:null},santeEtat:"inconnu",
+         recettes:[],semaine:{},modeAjout:"aliment",nommeRecette:null,jourSem:null,
+         sport:"muscu",cardio:"course5k",logCardio:null};
+/* 0 = lundi, pour suivre l'ordre de la semaine ; getDay() compte a partir de dimanche */
+const JOURS_SEM=[["Lundi","الاثنين"],["Mardi","الثلاثاء"],["Mercredi","الأربعاء"],["Jeudi","الخميس"],
+                 ["Vendredi","الجمعة"],["Samedi","السبت"],["Dimanche","الأحد"]];
+function jourSemDe(d){ return (new Date(d+"T12:00:00").getDay()+6)%7 }
+try{ const l=localStorage.getItem("fm_lang"); if(l==="ar"||l==="fr") S.lang=l }catch(_){}
+
+function L(v){ return Array.isArray(v)?(S.lang==="ar"?v[1]:v[0]):v }
+function t(k){ return T[k]?L(T[k]):k }
+function iso(d){const z=new Date(d.getTime()-d.getTimezoneOffset()*6e4);return z.toISOString().slice(0,10)}
+function frDate(s){const[a,m,j]=s.split("-");return `${j}/${m}/${a}`}
+function jourNom(s){return new Date(s+"T12:00:00").toLocaleDateString(S.lang==="ar"?"ar-MA-u-nu-latn":"fr-FR",{weekday:"long",day:"numeric",month:"long"})}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function r0(n){return Math.round(n)}
+function r1(n){return Math.round(n*10)/10}
+function norm(s){return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"")}
+function nomDe(a){ return S.lang==="ar" ? (a[6]?(a[7]||a[0]):(AR_NOM[a[0]]||a[0])) : a[0] }
+function nomEx(e){ return S.lang==="ar" ? (AR_EX[e]||e) : e }
+function trSerie(s){ return S.lang!=="ar" ? s
+  : s.replace(/\bmin\b/g,"د").replace(/\bs\b/g,"ث").replace(/\/ jambe/g,"/ رجل").replace(/superset/g,"سوبرسِت").replace(/ x /g," × ") }
+function catNom(k){ return L(CATS[k]) }
+
+/* ============================ CALCULS ============================ */
+function calculs(p){
+  const bmr = p.sexe==="h"
+    ? 10*p.poids + 6.25*p.taille - 5*p.age + 5
+    : 10*p.poids + 6.25*p.taille - 5*p.age - 161;
+  const tdee = bmr*ACT[p.activite].f;
+  const adj  = OBJ[p.objectif].r[p.rythme];
+  const kcal = r0(tdee*(1+adj));
+  const prot = r0(p.protKg*p.poids);
+  const lip  = r0(p.lipKg*p.poids);
+  const glu  = r0((kcal - prot*4 - lip*9)/4);
+  const kgSem = (kcal-tdee)*7/7700;
+  return {bmr:r0(bmr),tdee:r0(tdee),kcal,prot,lip,glu,adj,kgSem,
+          eau:r0(p.poids*35+500), fibres:r0(kcal/1000*14)};
+}
+function aliments(){
+  return BASE.concat(S.persos.map(a=>[a.nom,a.cat,a.kcal,a.p,a.g,a.l,a.id,a.nomAr]));
+}
+function totauxJour(){
+  const e=(S.journal[S.jour]||{entrees:[]}).entrees||[];
+  return e.reduce((o,x)=>{const q=x.qte/100;
+    o.kcal+=x.kcal*q;o.p+=x.p*q;o.g+=x.g*q;o.l+=x.l*q;return o},{kcal:0,p:0,g:0,l:0});
+}
+/* ---- repas composes ---- */
+/* Une recette garde le nom de ses aliments et leur quantite, pas leurs calories :
+   si tu corriges un aliment, toutes les recettes qui l'utilisent suivent. */
+function totauxRecette(r){
+  return (r.items||[]).reduce((t,it)=>{
+    const a=aliments().find(x=>x[0]===it.nom);
+    if(!a) return t;
+    const q=it.qte/100;
+    t.kcal+=a[2]*q; t.p+=a[3]*q; t.g+=a[4]*q; t.l+=a[5]*q; return t;
+  },{kcal:0,p:0,g:0,l:0});
+}
+function recetteParId(id){ return S.recettes.find(r=>r.id===id) }
+function nouvelId(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,5) }
+
+/* Ajoute les aliments d'une recette au journal d'une date, dans une prise donnee.
+   Les lignes restent independantes : tu peux en retirer ou en corriger une seule. */
+function versJournal(recette,date,ri,facteur){
+  const j=S.journal[date]||{date,v:2,entrees:[]};
+  const ajouts=[];
+  for(const it of recette.items||[]){
+    const a=aliments().find(x=>x[0]===it.nom);
+    if(!a) continue;
+    ajouts.push({id:nouvelId(),nom:a[0],ri,qte:r1(it.qte*(facteur||1)),
+      kcal:a[2],p:a[3],g:a[4],l:a[5],rec:recette.nom});
+  }
+  j.entrees=(j.entrees||[]).concat(ajouts);
+  S.journal[date]=j;
+  return {doc:j,n:ajouts.length};
+}
+
+/* ---- plan de la semaine ---- */
+function planDuJour(js){ return S.semaine[js]||[] }
+function totauxJourPlan(js){
+  return planDuJour(js).reduce((t,e)=>{
+    const r=recetteParId(e.rid); if(!r) return t;
+    const x=totauxRecette(r);
+    t.kcal+=x.kcal; t.p+=x.p; t.g+=x.g; t.l+=x.l; return t;
+  },{kcal:0,p:0,g:0,l:0});
+}
+
+function lissage(pes,n){
+  return pes.map((pt,i)=>{
+    const t0=new Date(pt.date).getTime()-(n-1)*864e5;
+    let s=0,c=0;
+    for(let j=i;j>=0;j--){ if(new Date(pes[j].date).getTime()<t0) break; s+=pes[j].poids; c++ }
+    return {date:pt.date,poids:s/c};
+  });
+}
+function tendance(){
+  const p=S.pesees; if(p.length<2) return null;
+  const l=lissage(p,7), fin=l[l.length-1], t1=new Date(fin.date).getTime();
+  let deb=l[0];
+  for(const x of l){ if(t1-new Date(x.date).getTime()<=28*864e5){deb=x;break} }
+  const j=(t1-new Date(deb.date).getTime())/864e5;
+  if(j<5) return null;
+  return {parSem:(fin.poids-deb.poids)/j*7, lisse:fin.poids, jours:r0(j)};
+}
+
+/* ============================ VIGNETTE ============================ */
+function icone(nom,cat){
+  const n=norm(nom);
+  for(const [re,id] of ICO_RULES) if(re.test(n)) return id;
+  return ICO_CAT[cat]||"i-plate";
+}
+const slugAl = n => n.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"")
+  .replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+/* photo embarquee : PHOTOS garde l'extension, le chemin est img/<slug>.<ext> */
+function cheminPhoto(nom){ const s=slugAl(nom); return PHOTOS[s] ? `img/${s}.${PHOTOS[s]}` : null }
+
+function vignette(a,taille){
+  const cle=a[0], perso=S.photos[cle], src = perso ? `/_blob/${esc(perso)}` : cheminPhoto(cle);
+  /* le dessin reste dessous : il reapparait si la photo ne charge pas */
+  const fond = `<svg viewBox="0 0 24 24" style="color:var(--c-${a[1]})" fill="currentColor" fill-opacity=".22"
+      stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#${icone(cle,a[1])}"></use></svg>`;
+  const img = src ? `<img src="${src}" alt="${esc(nomDe(a))}" loading="lazy" decoding="async" onerror="this.remove()">` : "";
+  const btn = ASSETS ? `<button class="photo-btn" data-photo="${esc(cle)}" title="${t("photo_t")}">${t("photo")}</button>` : "";
+  return `<span class="vig${taille?" "+taille:""}">${fond}${img}${btn}</span>`;
+}
+
+/* ============================ PERSISTANCE ============================ */
+/* Deux supports. Dans l'artifact, le magasin de Claude ; dans l'APK, le stockage
+   de l'appareil. On ecrit toujours en local, ce qui sert aussi de secours hors ligne. */
+let userDoc=null, ASSETS=null;
+const CLE_LOCALE="fonte_macros_v1";
+
+function sauveLocal(){
+  try{ localStorage.setItem(CLE_LOCALE, JSON.stringify({
+    v:2, profil:S.profil, photos:S.photos, pesees:S.pesees,
+    journal:S.journal, persos:S.persos, seances:S.seances, sante:S.sante,
+    recettes:S.recettes, semaine:S.semaine })) }
+  catch(_){ /* navigation privee ou stockage plein : on continue sans */ }
+}
+function chargeLocal(){
+  let d=null;
+  try{ d=JSON.parse(localStorage.getItem(CLE_LOCALE)||"null") }catch(_){}
+  if(!d) return false;
+  if(d.profil){ S.profil={...DEFAUT,...d.profil}; S.profilCharge=true }
+  S.photos=d.photos||{}; S.pesees=d.pesees||[]; S.journal=d.journal||{};
+  S.persos=d.persos||[]; S.seances=d.seances||[]; S.sante=d.sante||S.sante;
+  S.recettes=d.recettes||[]; S.semaine=d.semaine||{};
+  return true;
+}
+async function connecte(){
+  try{
+    const db = await window.claude?.use?.("db");
+    const user = await window.claude?.use?.("user");
+    if(!db || !user) return majSync(false);
+    const uid = await user.id();
+    if(!uid) return majSync(false);
+    S.db=db; S.uid=uid;
+    userDoc = db.collection("data/users/"+uid).doc("fonte");
+    majSync(true);
+    claude.use("assets").then(a=>{ if(a){ ASSETS=a; rend() } }).catch(()=>{});
+    const pr = await userDoc.get();
+    if(pr.exists){
+      const d=pr.data();
+      if(d.profil){ S.profil={...DEFAUT,...d.profil}; S.profilCharge=true }
+      if(d.photos) S.photos=d.photos;
+      if(d.semaine) S.semaine=d.semaine;
+      if(d.sante) S.sante={...S.sante,...d.sante};
+    }
+    const [pes,jrn,per,sea,rec]=await Promise.all([
+      userDoc.collection("pesees").orderBy("date").get(),
+      userDoc.collection("journal").get(),
+      userDoc.collection("aliments").get(),
+      userDoc.collection("seances").orderBy("date","desc").limit(60).get(),
+      userDoc.collection("recettes").get()
+    ]);
+    S.recettes = rec.docs.map(d=>({id:d.id,...d.data()}));
+    S.pesees = pes.docs.map(d=>d.data()).filter(x=>x&&x.date).sort((a,b)=>a.date<b.date?-1:1);
+    jrn.docs.forEach(d=>{ S.journal[d.id]=structuredClone(d.data()) });
+    migreJournal();
+    S.persos = per.docs.map(d=>({id:d.id,...d.data()}));
+    S.seances = sea.docs.map(d=>({id:d.id,...d.data()}));
+    rend();
+  }catch(e){ majSync(false); console.warn("db indisponible",e) }
+}
+/* Trois etats : magasin distant, stockage de l'appareil, ou rien du tout.
+   Dans l'APK il n'y a pas de magasin distant, mais le stockage local fonctionne :
+   annoncer « non sauvegarde » serait faux et inquietant. */
+function stockageLocalDispo(){
+  try{ localStorage.setItem("fm_test","1"); localStorage.removeItem("fm_test"); return true }
+  catch(_){ return false }
+}
+function majSync(on){
+  S.sync=on;
+  const el=document.getElementById("hdSync"); if(!el) return;
+  const etat = on ? "nuage" : (stockageLocalDispo() ? "appareil" : "aucun");
+  el.textContent = t("sync_"+etat);
+  el.title = t("sync_"+etat+"_t");
+}
+async function ecrire(fn){
+  sauveLocal();
+  if(!userDoc) return;
+  try{ await fn(userDoc) }
+  catch(e){ console.warn("ecriture refusee",e); majSync(false) }
+}
+/* Les premieres versions ne connaissaient que 4 prises fixes. On replace ce qui a
+   ete note sur la liste de reference, une fois, puis on marque la journee v:2. */
+const ANCIENS=["Petit-dejeuner","Dejeuner","Diner","Collation"], VERS=[0,2,4,3];
+function migreJournal(){
+  for(const [jour,d] of Object.entries(S.journal)){
+    if(!d || d.v>=2 || !Array.isArray(d.entrees)) continue;
+    d.entrees=d.entrees.map(x=>{
+      const vieux = typeof x.ri==="number" ? x.ri : ANCIENS.indexOf(x.repas);
+      const {repas,...reste}=x;
+      return {...reste, ri: VERS[vieux] !== undefined ? VERS[vieux] : 0};
+    });
+    d.v=2;
+    ecrire(doc=>doc.collection("journal").doc(jour).set(d));
+  }
+}
+async function sauveProfil(){
+  await ecrire(async d=>{ await d.set({profil:S.profil, photos:S.photos, maj:new Date().toISOString()}) });
+}
+
+/* ============================ RENDU ============================ */
+const ONGLETS=[["profil","tab_profil"],["poids","tab_poids"],["nutrition","tab_nutrition"],
+               ["semaine","tab_semaine"],["base","tab_base"],["entrainement","tab_entr"],["sante","tab_sante"]];
+
+/* ============================ MONTRE & SANTE ============================ */
+/* L'enveloppe mobile expose window.Sante. Dans la page web il n'existe pas :
+   l'onglet explique alors ou trouver l'application. Le pont rend, par journee :
+   kcal = depense active mesuree, dist = metres, sommeil = minutes, fc = battements/min, pas. */
+function pontSante(){ return (typeof window!=="undefined" && window.Sante) || null }
+
+async function brancheSante(){
+  const p=pontSante();
+  if(!p){ S.santeEtat="absent"; return }
+  try{
+    const d=await p.disponible();
+    S.sante.source=(d&&d.source)||"";
+    S.sante.raison=(d&&d.raison)||"";
+    S.sante.manquantes=(d&&d.manquantes)||[];
+    if(!d||!d.ok){ S.santeEtat="indisponible"; rend(); return }
+    S.santeEtat = d.autorise ? "connecte" : "a_autoriser";
+    if(d.autorise) await litSante();
+    rend();
+  }catch(e){ console.warn("sante",e); S.santeEtat="indisponible"; rend() }
+}
+async function litSante(){
+  const p=pontSante(); if(!p) return;
+  const fin=new Date(), debut=new Date(fin.getTime()-29*864e5);
+  const lignes=await p.jours(iso(debut),iso(fin));
+  for(const l of lignes||[]) if(l&&l.date) S.sante.jours[l.date]=l;
+  if(p.seances){
+    try{ S.sante.seances=await p.seances(iso(debut),iso(fin))||[] }
+    catch(e){ console.warn("seances montre",e) }
+  }
+  S.sante.maj=new Date().toISOString();
+  await ecrire(doc=>doc.set({profil:S.profil,photos:S.photos,sante:S.sante,maj:S.sante.maj}));
+}
+function santeDuJour(d){ return S.sante.jours[d||S.jour]||null }
+
+/* ---- estimation contre mesure ----
+   Deux chiffres qui ne mesurent pas la meme chose :
+   l'application estime l'effort depuis la duree et le poids, la montre mesure
+   la depense pendant ses propres seances. On garde la moyenne des deux quand
+   les deux existent, parce qu'aucun n'est plus vrai que l'autre. */
+function comparaisonJour(date){
+  const miennes=S.seances.filter(s=>s.date===date);
+  if(!miennes.length) return null;
+  const estime=miennes.reduce((t,s)=>t+kcalSeance(s),0);
+  const duree=miennes.reduce((t,s)=>t+(s.duree||0),0);
+  const dMontre=(S.sante.seances||[]).filter(s=>s.date===date&&s.kcal!=null);
+  const mesure=dMontre.length?dMontre.reduce((t,s)=>t+s.kcal,0):null;
+  return {
+    date, estime:r0(estime), duree,
+    mesure: mesure!=null?r0(mesure):null,
+    nMontre: dMontre.length,
+    retenu: mesure!=null?r0((estime+mesure)/2):r0(estime),
+    ecart: mesure!=null&&estime>0?r0((mesure-estime)/estime*100):null,
+    types:[...new Set(miennes.map(s=>s.type==="cardio"?"cardio":"muscu"))]
+  };
+}
+function comparaisons(n){
+  return [...new Set(S.seances.map(s=>s.date))].sort().reverse().slice(0,n||10)
+    .map(comparaisonJour).filter(Boolean);
+}
+
+/* Cible dynamique : socle au repos + depense active reellement mesuree.
+   Le facteur d'activite du profil est alors ignore, sinon l'effort compterait deux fois. */
+function cibleDuJour(c,date){
+  const h=santeDuJour(date);
+  if(!S.sante.cibleDyn || !h || !h.kcal) return {kcal:c.kcal,dyn:false};
+  const socle=calculs({...S.profil,activite:"sedentaire"}).tdee;
+  return {kcal:r0((socle+h.kcal)*(1+c.adj)), dyn:true, actif:r0(h.kcal)};
+}
+
+function rend(){
+  const c=calculs(S.profil), ar=S.lang==="ar";
+  document.documentElement.setAttribute("lang",ar?"ar":"fr");
+  document.documentElement.setAttribute("dir",ar?"rtl":"ltr");
+  document.body.setAttribute("dir",ar?"rtl":"ltr");
+  document.getElementById("hdPoidsL").innerHTML=`${t("poids")} <b id="hdPoids">${r1(S.profil.poids)} ${t("kg")}</b>`;
+  document.getElementById("hdKcalL").innerHTML=`${t("cible")} <b id="hdKcal">${c.kcal}</b> ${t("kcal")}`;
+  majSync(!!S.sync);
+  document.querySelectorAll(".lang button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.lang===S.lang));
+  document.getElementById("rail").innerHTML=ONGLETS.map(([k,lab])=>
+    `<button role="tab" data-tab="${k}" aria-selected="${S.tab===k}">${t(lab)}</button>`).join("");
+  const v=document.getElementById("vue");
+  v.className="fade";
+  v.innerHTML=({profil:vProfil,poids:vPoids,nutrition:vNutrition,semaine:vSemaine,
+                base:vBase,entrainement:vEntrainement,sante:vSante})[S.tab](c);
+  /* SMIL ne se coupe pas en CSS : on fige la pose de depart si le systeme demande moins d'animation */
+  try{ if(matchMedia("(prefers-reduced-motion: reduce)").matches)
+    v.querySelectorAll("svg.mv").forEach(s=>s.pauseAnimations()) }catch(_){}
+}
+
+/* ---------- profil ---------- */
+function vProfil(c){
+  const opts=(obj,val)=>Object.entries(obj).map(([k,o])=>
+    `<option value="${k}" ${k===val?"selected":""}>${esc(L(o.t))}</option>`).join("");
+  return `
+  <div class="stack">
+    <div>
+      <p class="eyebrow">${t("etape")} 1</p>
+      <h1 style="font-size:26px">${t("p_h1")}</h1>
+      <p class="lede">${t("p_lede")}${S.profilCharge?"":` <em>${t("p_exemple")}</em>`}</p>
+    </div>
+
+    <div class="card">
+      <div class="grid g3">
+        <div class="field"><label for="f_sexe">${t("sexe")}</label><select id="f_sexe">
+          <option value="h" ${S.profil.sexe==="h"?"selected":""}>${t("homme")}</option>
+          <option value="f" ${S.profil.sexe==="f"?"selected":""}>${t("femme")}</option></select></div>
+        <div class="field"><label for="f_age">${t("age")}</label><input id="f_age" type="number" min="14" max="90" value="${S.profil.age}"></div>
+        <div class="field"><label for="f_taille">${t("taille")}</label><input id="f_taille" type="number" min="130" max="220" value="${S.profil.taille}"></div>
+        <div class="field"><label for="f_poids">${t("poids_actuel")}</label><input id="f_poids" type="number" step="0.1" min="35" max="250" value="${S.profil.poids}"></div>
+        <div class="field"><label for="f_cible">${t("poids_vise")}</label><input id="f_cible" type="number" step="0.1" min="35" max="250" value="${S.profil.cible}"></div>
+        <div class="field"><label for="f_activite">${t("activite")}</label><select id="f_activite">${opts(ACT,S.profil.activite)}</select></div>
+        <div class="field"><label for="f_objectif">${t("objectif")}</label><select id="f_objectif">${opts(OBJ,S.profil.objectif)}</select></div>
+        <div class="field"><label for="f_rythme">${t("rythme")}</label><select id="f_rythme" ${S.profil.objectif==="maintien"?"disabled":""}>
+          ${Object.entries(RYTHME).map(([k,v])=>`<option value="${k}" ${k===S.profil.rythme?"selected":""}>${L(v)}</option>`).join("")}</select></div>
+        <div class="field"><label for="f_prot">${t("prot_kg")}</label><input id="f_prot" type="number" step="0.1" min="1" max="3.5" value="${S.profil.protKg}"></div>
+        <div class="field"><label for="f_lip">${t("lip_kg")}</label><input id="f_lip" type="number" step="0.1" min="0.4" max="2" value="${S.profil.lipKg}"></div>
+      </div>
+      <p class="hint" style="margin:12px 0 0">${t("p_reperes")}</p>
+    </div>
+
+    <div class="stack" id="res">${blocResultats(c)}</div>
+  </div>`;
+}
+function blocResultats(c){
+  const alerte = c.glu<60 ? `<div class="note warn"><b>${t("glu_bas")} (${c.glu} ${t("g")}).</b> ${t("glu_bas_t")}</div>` : "";
+  return `
+    <div class="grid g3">
+      <div class="kpi"><div class="k">${c.bmr}<span class="u"> ${t("kcal")}</span></div><div class="n">${t("bmr")}</div>
+        <p class="x">${t("bmr_x")}</p></div>
+      <div class="kpi"><div class="k">${c.tdee}<span class="u"> ${t("kcal")}</span></div><div class="n">${t("tdee")} (×${ACT[S.profil.activite].f})</div>
+        <p class="x">${t("tdee_x")}</p></div>
+      <div class="kpi hero"><div class="k">${c.kcal}<span class="u"> ${t("kcal")}</span></div><div class="n">${t("cible_jour")} · ${L(OBJ[S.profil.objectif].t)}${c.adj?` ${c.adj>0?"+":"−"}${Math.abs(r0(c.adj*100))} %`:""}</div>
+        <p class="x">${t("cible_x")}</p></div>
+    </div>
+    ${alerte}
+    <div class="grid g2">
+      <div class="card">
+        <p class="eyebrow">${t("macros")}</p>
+        <div style="margin-top:10px">
+          ${macroLigne(t("prot"),c.prot,c.prot*4,c.kcal,"var(--prot)")}
+          ${macroLigne(t("gluc"),c.glu,c.glu*4,c.kcal,"var(--carb)")}
+          ${macroLigne(t("lip"),c.lip,c.lip*9,c.kcal,"var(--fat)")}
+        </div>
+        <hr class="sep" style="margin:14px 0">
+        <div class="row" style="gap:24px">
+          <div><div class="eyebrow">${t("eau")}</div><div class="num" style="font-size:17px">${(c.eau/1000).toFixed(1)} L</div></div>
+          <div><div class="eyebrow">${t("fibres")}</div><div class="num" style="font-size:17px">${c.fibres} ${t("g")}</div></div>
+          <div><div class="eyebrow">${t("rythme_attendu")}</div><div class="num" style="font-size:17px;color:${c.kgSem<0?"var(--steel)":c.kgSem>0?"var(--accent)":"inherit"}">${c.kgSem>0?"+":""}${r1(c.kgSem)}</div> <span class="hint">${t("kg_sem")}</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="row" style="justify-content:space-between;align-items:center;gap:12px">
+          <p class="eyebrow" style="margin:0">${t("assiette")}</p>
+          <div class="field" style="flex:0 0 auto"><label for="r_nb">${t("nb_prises")}</label>
+            <select id="r_nb" style="width:auto">${[1,2,3,4,5,6].map(n=>
+              `<option value="${n}" ${n===S.profil.nbRepas?"selected":""}>${n}</option>`).join("")}</select></div>
+        </div>
+        <h3 style="font-size:17px;margin:8px 0">${t("repartition")} <span class="num">${c.kcal}</span> ${t("kcal")}</h3>
+        <div class="tw" style="border:0">
+          <table><thead><tr><th>${t("repas")}</th><th class="n">${t("kcal")}</th><th class="n">${t("prot_c")}</th><th class="n">${t("gluc_c")}</th><th class="n">${t("lip_c")}</th></tr></thead><tbody>
+          ${plan().map(([i,f])=>
+            `<tr><td>${L(REPAS[i])}</td><td class="n">${r0(c.kcal*f)}</td><td class="n">${r0(c.prot*f)}</td><td class="n">${r0(c.glu*f)}</td><td class="n">${r0(c.lip*f)}</td></tr>`).join("")}
+          </tbody></table>
+        </div>
+        <p class="hint" style="margin:10px 0 0">${t("assiette_h")}</p>
+      </div>
+    </div>
+    <div class="note">${t("disclaimer")}</div>`;
+}
+function macroLigne(nom,g,kcal,total,col){
+  const pct=total?Math.min(100,kcal/total*100):0;
+  return `<div class="macro"><div class="nm"><span class="sw" style="background:${col}"></span>${nom}</div>
+    <div class="bar"><span style="width:${pct}%;background:${col}"></span></div>
+    <div class="vl">${g} ${t("g")} · ${r0(pct)} %</div></div>`;
+}
+
+/* ---------- poids ---------- */
+function vPoids(c){
+  const td=tendance(), p=S.pesees, dernier=p.length?p[p.length-1]:null;
+  let projection="";
+  if(td && Math.abs(td.parSem)>0.05){
+    const reste=S.profil.cible-td.lisse, sm=reste/td.parSem;
+    projection = sm>0 && sm<260
+      ? `<div class="kpi"><div class="k">${r0(sm)}<span class="u"> ${t("sem")}</span></div><div class="n">${t("pour_atteindre")} ${r1(S.profil.cible)} ${t("kg")} ${t("a_ce_rythme")}</div></div>`
+      : `<div class="kpi"><div class="k">—</div><div class="n">${t("pas_vers")} ${r1(S.profil.cible)} ${t("kg")}</div></div>`;
+  }
+  return `
+  <div class="stack">
+    <div>
+      <p class="eyebrow">${t("etape")} 2</p>
+      <h1 style="font-size:26px">${t("tab_poids")}</h1>
+      <p class="lede">${t("w_lede")}</p>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <div class="field" style="flex:1 1 150px"><label for="p_date">${t("date")}</label><input id="p_date" type="date" value="${S.jour}" max="${iso(new Date())}"></div>
+        <div class="field" style="flex:1 1 130px"><label for="p_val">${t("poids_kg")}</label><input id="p_val" type="number" step="0.1" min="35" max="250" placeholder="${dernier?r1(dernier.poids):r1(S.profil.poids)}"></div>
+        <button class="btn" id="p_add">${t("enreg_pesee")}</button>
+      </div>
+    </div>
+
+    ${p.length<2 ? `<div class="empty"><strong>${t("w_vide_t")}</strong>${t("w_vide")}</div>`
+      : `<div class="card">${graphe(p)}</div>`}
+
+    <div class="grid g3">
+      <div class="kpi"><div class="k">${dernier?r1(dernier.poids):"—"}<span class="u"> ${t("kg")}</span></div><div class="n">${dernier?t("derniere_pesee")+" · "+frDate(dernier.date):t("aucune_pesee")}</div></div>
+      <div class="kpi"><div class="k">${td?r1(td.lisse):"—"}<span class="u"> ${t("kg")}</span></div><div class="n">${t("moy7")}</div></div>
+      <div class="kpi ${td?"hero":""}"><div class="k">${td?(td.parSem>0?"+":"")+r1(td.parSem):"—"}<span class="u"> ${t("kg_sem")}</span></div><div class="n">${td?`${t("tendance_sur")} ${td.jours} ${t("jours")}`:t("min5j")}</div></div>
+      ${projection}
+    </div>
+
+    ${td?comparaisonTendance(td,c):""}
+
+    ${p.length?`<div class="tw"><table><thead><tr><th>${t("date")}</th><th class="n">${t("poids")}</th><th class="n">${t("variation")}</th><th></th></tr></thead><tbody>
+      ${p.slice().reverse().slice(0,30).map((x,i,arr)=>{
+        const prec=arr[i+1], d=prec?x.poids-prec.poids:null;
+        return `<tr><td class="n">${frDate(x.date)}</td><td class="n">${r1(x.poids)}</td>
+          <td class="n" style="color:${d===null?"var(--muted)":d<0?"var(--steel)":d>0?"var(--accent)":"var(--muted)"}">${d===null?"—":(d>0?"+":"")+r1(d)}</td>
+          <td class="e" style="width:1%"><button class="del" data-delpesee="${x.date}" aria-label="${t("date")} ${frDate(x.date)}">&times;</button></td></tr>`
+      }).join("")}
+    </tbody></table></div>`:""}
+  </div>`;
+}
+function comparaisonTendance(td,c){
+  const vise=c.kgSem, ecart=td.parSem-vise;
+  const sgn=n=>(n>0?"+":"")+r1(n);
+  if(Math.abs(ecart)<0.12)
+    return `<div class="note">${t("tu_avances")} <span class="num">${sgn(td.parSem)}</span> ${t("kg_sem")}, ${t("pour_cible")} <span class="num">${sgn(vise)}</span>. ${t("ok_fourchette")}</div>`;
+  const k=r0(Math.abs(ecart)*7700/7/50)*50;
+  const action = ecart>0
+    ? (vise<0 ? `${t("retire")} ${k} ${t("par_jour")} ${t("ou_cardio")}` : `${t("prend_vite")} ${t("retire")} ${k} ${t("par_jour")}`)
+    : (vise<0 ? `${t("perd_vite")} ${t("remets")} ${k} ${t("par_jour")}` : `${t("ajoute")} ${k} ${t("par_jour")}`);
+  return `<div class="note warn">${t("tendance_reelle")} (<span class="num">${sgn(td.parSem)}</span> ${t("kg_sem")}) ${t("est")} ${ecart>0?t("au_dessus"):t("en_dessous")} (<span class="num">${sgn(vise)}</span>). ${action}</div>`;
+}
+function graphe(p){
+  const W=720,H=230,mL=44,mR=14,mT=16,mB=26;
+  const l=lissage(p,7);
+  const tt=p.map(x=>new Date(x.date).getTime());
+  const t0=Math.min(...tt), t1=Math.max(...tt), dt=t1-t0||1;
+  const vals=p.map(x=>x.poids).concat([S.profil.cible]);
+  let v0=Math.min(...vals), v1=Math.max(...vals);
+  const pad=Math.max(0.6,(v1-v0)*0.15); v0-=pad; v1+=pad;
+  const X=d=>mL+(new Date(d).getTime()-t0)/dt*(W-mL-mR);
+  const Y=v=>mT+(v1-v)/(v1-v0)*(H-mT-mB);
+  const gy=[];
+  for(let i=0;i<=4;i++){const v=v0+(v1-v0)*i/4;
+    gy.push(`<line class="ax" x1="${mL}" y1="${Y(v).toFixed(1)}" x2="${W-mR}" y2="${Y(v).toFixed(1)}" opacity=".55"/><text class="lbl" x="${mL-7}" y="${(Y(v)+4).toFixed(1)}" text-anchor="end">${v.toFixed(1)}</text>`)}
+  const ptsBrut=p.map(x=>`${X(x.date).toFixed(1)},${Y(x.poids).toFixed(1)}`).join(" ");
+  const ptsLisse=l.map(x=>`${X(x.date).toFixed(1)},${Y(x.poids).toFixed(1)}`).join(" ");
+  const aire=`${mL},${(H-mB).toFixed(1)} ${ptsLisse} ${(W-mR).toFixed(1)},${(H-mB).toFixed(1)}`;
+  const fin=l[l.length-1];
+  const cy=Y(S.profil.cible), dans = cy>mT && cy<H-mB;
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" width="100%" style="max-width:100%;display:block" role="img"
+      aria-label="${frDate(p[0].date)} — ${frDate(p[p.length-1].date)} : ${r1(fin.poids)} kg">
+    <defs><linearGradient id="gAire" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="var(--accent)" stop-opacity=".22"/><stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/>
+    </linearGradient></defs>
+    ${gy.join("")}
+    ${dans?`<line x1="${mL}" y1="${cy.toFixed(1)}" x2="${W-mR}" y2="${cy.toFixed(1)}" stroke="var(--steel)" stroke-width="1.5" stroke-dasharray="5 4"/>
+      <text class="lbl" x="${W-mR}" y="${(cy-6).toFixed(1)}" text-anchor="end" fill="var(--steel)">${r1(S.profil.cible)} kg</text>`:""}
+    <polygon points="${aire}" fill="url(#gAire)"/>
+    <polyline points="${ptsBrut}" fill="none" stroke="var(--muted)" stroke-width="1.2" opacity=".5"/>
+    ${p.map(x=>`<circle cx="${X(x.date).toFixed(1)}" cy="${Y(x.poids).toFixed(1)}" r="2.2" fill="var(--muted)" opacity=".6"/>`).join("")}
+    <polyline points="${ptsLisse}" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="${X(fin.date).toFixed(1)}" cy="${Y(fin.poids).toFixed(1)}" r="9" fill="var(--accent)" opacity=".2"/>
+    <circle cx="${X(fin.date).toFixed(1)}" cy="${Y(fin.poids).toFixed(1)}" r="5" fill="var(--accent)"/>
+    <text class="lbl" x="${mL}" y="${H-7}">${frDate(p[0].date)}</text>
+    <text class="lbl" x="${W-mR}" y="${H-7}" text-anchor="end">${frDate(p[p.length-1].date)}</text>
+  </svg>
+  <p class="hint" style="margin:8px 0 0"><span class="sw" style="background:var(--accent)"></span>${t("leg_moy")} &nbsp;·&nbsp; <span class="sw" style="background:var(--muted)"></span>${t("leg_brut")}</p>`;
+}
+
+/* ---------- nutrition ---------- */
+function vNutrition(c){
+  const tot=totauxJour();
+  const e=(S.journal[S.jour]||{entrees:[]}).entrees||[];
+  const cj=cibleDuJour(c,S.jour), cible=cj.kcal;
+  const reste=cible-tot.kcal;
+  const a=S.sel;
+  return `
+  <div class="stack">
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <div>
+        <p class="eyebrow">${t("etape")} 3</p>
+        <h1 style="font-size:26px;text-transform:capitalize">${jourNom(S.jour)}</h1>
+      </div>
+      <div class="row" style="gap:6px">
+        <button class="btn ghost mini" id="j_prev" aria-label="−1">${S.lang==="ar"?"&#8594;":"&#8592;"}</button>
+        <button class="btn ghost mini" id="j_today">${t("aujourdhui")}</button>
+        <button class="btn ghost mini" id="j_next" aria-label="+1" ${S.jour>=iso(new Date())?"disabled":""}>${S.lang==="ar"?"&#8592;":"&#8594;"}</button>
+      </div>
+    </div>
+
+    <div class="grid g2">
+      <div class="card">
+        <div class="row" style="justify-content:space-between;align-items:baseline">
+          <div><div class="num" style="font-size:34px;font-weight:600;color:${reste<0?"var(--bad)":"var(--accent)"}">${r0(tot.kcal)}</div>
+               <div class="hint">${t("sur")} ${cible} ${t("kcal")}${cj.dyn?` · ${cj.actif} ${t("cible_dyn_actif")}`:""}</div></div>
+          <div style="text-align:end"><div class="num" style="font-size:20px;font-weight:600">${reste>=0?r0(reste):r0(-reste)}</div>
+               <div class="hint">${reste>=0?t("restantes"):t("au_dela")}</div></div>
+        </div>
+        <div class="bar" style="height:12px;margin-top:12px"><span style="width:${Math.min(100,cible?tot.kcal/cible*100:0)}%;background:${reste<0?"var(--bad)":"var(--accent)"}"></span></div>
+      </div>
+      <div class="card">
+        ${macroJour(t("prot"),tot.p,c.prot,"var(--prot)")}
+        ${macroJour(t("gluc"),tot.g,c.glu,"var(--carb)")}
+        ${macroJour(t("lip"),tot.l,c.lip,"var(--fat)")}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <p class="eyebrow" style="margin:0">${t("ajouter_aliment")}</p>
+        <div class="row" style="gap:6px">
+          <button class="btn ${S.modeAjout==="aliment"?"":"ghost"} mini" data-mode="aliment">${t("mode_aliment")}</button>
+          <button class="btn ${S.modeAjout==="recette"?"":"ghost"} mini" data-mode="recette">${t("mode_recette")} (${S.recettes.length})</button>
+        </div>
+      </div>
+      ${S.modeAjout==="aliment" ? `
+      <div class="row" style="margin-top:12px">
+        <div class="field" style="flex:2 1 220px"><label for="n_q">${t("chercher_dans")} ${aliments().length} ${t("aliments_m")}</label>
+          <input id="n_q" class="inp" type="search" value="${esc(S.q)}" autocomplete="off"></div>
+        <div class="field" style="flex:1 1 160px"><label for="n_cat">${t("categorie")}</label>
+          <select id="n_cat"><option value="">${t("toutes")}</option>${Object.keys(CATS).map(k=>`<option value="${k}" ${S.cat===k?"selected":""}>${catNom(k)}</option>`).join("")}</select></div>
+      </div>
+
+      <div class="hits" id="hits" style="margin-top:12px">${blocHits(recherche().slice(0,40),a)}</div>
+
+      ${a?`<hr class="sep" style="margin:14px 0">
+      <div class="row">
+        <div class="field" style="flex:2 1 200px"><label>${t("aliment_choisi")}</label>
+          <div class="inp nom" style="background:var(--accent-soft);border-color:transparent;font-weight:600">${vignette(a,"s")}<span>${esc(nomDe(a))}</span></div></div>
+        <div class="field" style="flex:1 1 110px"><label for="n_qte">${t("quantite")}</label><input id="n_qte" type="number" min="1" max="3000" step="5" value="100"></div>
+        <div class="field" style="flex:1 1 150px"><label for="n_repas">${t("repas")}</label><select id="n_repas">${plan().map(([i])=>`<option value="${i}" ${i===repasSuggere()?"selected":""}>${L(REPAS[i])}</option>`).join("")}</select></div>
+        <button class="btn" id="n_add">${t("ajouter")}</button>
+      </div>
+      <p class="hint" id="n_apercu" style="margin:8px 0 0">${apercu(a,100)}</p>`:""}
+      ` : blocRecettes()}
+    </div>
+    ${blocRepas(e)}
+  </div>`;
+}
+function apercu(a,q){
+  return `${r0(q)} ${t("g")} = <span class="num">${r0(a[2]*q/100)}</span> ${t("kcal")} · ${t("prot")} <span class="num">${r1(a[3]*q/100)}</span> ${t("g")} · ${t("gluc")} <span class="num">${r1(a[4]*q/100)}</span> ${t("g")} · ${t("lip")} <span class="num">${r1(a[5]*q/100)}</span> ${t("g")}`;
+}
+function blocHits(liste,a){
+  if(!liste.length) return `<div class="empty" style="border:0">${t("aucun_match")}</div>`;
+  return liste.map((x,i)=>
+    `<button class="hit" data-pick="${i}" aria-current="${!!(a&&a[0]===x[0])}">
+       ${vignette(x,"s")}
+       <span><span class="t">${esc(nomDe(x))}</span><br><span class="s">${catNom(x[1])}</span></span>
+       <span class="v"><b>${r0(x[2])}</b> ${t("kcal")} · ${r1(x[3])} / ${r1(x[4])} / ${r1(x[5])}</span>
+     </button>`).join("");
+}
+/* Liste des repas composes, avec leur contenu et leurs totaux calcules a la volee. */
+function blocRecettes(){
+  if(!S.recettes.length)
+    return `<div class="empty" style="margin-top:12px"><strong>${t("rec_vide_t")}</strong>${t("rec_vide")}</div>`;
+  return `<div style="margin-top:12px" class="stack">
+    ${S.recettes.map(r=>{
+      const x=totauxRecette(r), n=(r.items||[]).length;
+      return `<div class="card" style="padding:12px">
+        <div class="row" style="justify-content:space-between;align-items:flex-start">
+          <div style="min-width:0">
+            <div style="font-weight:600">${esc(r.nom)}</div>
+            <div class="hint">${n} ${n>1?t("aliments_m"):t("aliment").toLowerCase()} · <span class="num">${r0(x.kcal)}</span> ${t("kcal")}
+              · ${t("prot")} <span class="num">${r0(x.p)}</span> · ${t("gluc")} <span class="num">${r0(x.g)}</span> · ${t("lip")} <span class="num">${r0(x.l)}</span> ${t("g")}</div>
+          </div>
+          <button class="del" data-delrec="${r.id}" aria-label="${esc(r.nom)}">&times;</button>
+        </div>
+        <div class="hint" style="margin:8px 0">${(r.items||[]).map(it=>{
+            const a=aliments().find(y=>y[0]===it.nom);
+            return `${esc(a?nomDe(a):it.nom)} <span class="num">${r1(it.qte)}</span> ${t("g")}`;
+          }).join(" · ")}</div>
+        <div class="row">
+          <div class="field" style="flex:0 1 110px"><label for="rq_${r.id}">${t("rec_portion")}</label>
+            <input id="rq_${r.id}" type="number" min="0.25" max="5" step="0.25" value="1"></div>
+          <div class="field" style="flex:1 1 150px"><label for="rp_${r.id}">${t("repas")}</label>
+            <select id="rp_${r.id}">${plan().map(([i])=>`<option value="${i}" ${i===repasSuggere()?"selected":""}>${L(REPAS[i])}</option>`).join("")}</select></div>
+          <button class="btn mini" data-addrec="${r.id}">${t("ajouter")}</button>
+        </div>
+      </div>`;
+    }).join("")}
+  </div>`;
+}
+
+function blocRepas(e){
+  if(!e.length) return `<div class="empty"><strong>${t("jour_vide_t")}</strong>${t("jour_vide")}</div>`;
+  /* on affiche toute prise qui porte quelque chose, meme si elle n'est plus au plan */
+  return REPAS.map((r,ri)=>{
+    const items=e.filter(x=>x.ri===ri);
+    if(!items.length) return "";
+    const sk=items.reduce((s,x)=>s+x.kcal*x.qte/100,0);
+    return `<div class="meal">
+    <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:6px">
+      <h4 style="margin:0">${L(r)} · <span class="num">${r0(sk)}</span> ${t("kcal")}</h4>
+      <button class="btn ghost mini" data-nommer="${ri}">${t("rec_enregistrer")}</button>
+    </div>
+    ${S.nommeRecette===ri?`<div class="row" style="margin-bottom:8px">
+      <div class="field" style="flex:2 1 200px"><label for="rec_nom">${t("rec_nom")}</label>
+        <input id="rec_nom" placeholder="${esc(t("rec_exemple"))}"></div>
+      <button class="btn" data-creerec="${ri}">${t("creer")}</button>
+      <button class="btn ghost" id="rec_annule">${t("annuler")}</button>
+    </div>`:""}
+    <div class="tw"><table><tbody>
+    ${items.map(x=>{
+      const al=aliments().find(y=>y[0]===x.nom)||[x.nom,"A",x.kcal,x.p,x.g,x.l];
+      return `<tr><td><span class="nom">${vignette(al,"s")}<span>${esc(nomDe(al))}</span></span></td>
+      <td class="n" style="color:var(--muted)">${r0(x.qte)} ${t("g")}</td>
+      <td class="n">${r0(x.kcal*x.qte/100)} ${t("kcal")}</td>
+      <td class="n" style="color:var(--muted)">${r1(x.p*x.qte/100)} / ${r1(x.g*x.qte/100)} / ${r1(x.l*x.qte/100)}</td>
+      <td class="e" style="width:1%"><button class="del" data-delentree="${x.id}" aria-label="${esc(nomDe(al))}">&times;</button></td></tr>`}).join("")}
+    </tbody></table></div></div>`}).join("");
+}
+function macroJour(nom,v,cible,col){
+  const pct=cible?Math.min(100,v/cible*100):0;
+  return `<div class="macro"><div class="nm"><span class="sw" style="background:${col}"></span>${nom}</div>
+    <div class="bar"><span style="width:${pct}%;background:${col}"></span></div>
+    <div class="vl">${r0(v)} / ${cible} ${t("g")}</div></div>`;
+}
+/* la prise du plan dont l'heure habituelle est la plus proche de maintenant */
+function repasSuggere(){
+  const d=new Date(), h=d.getHours()+d.getMinutes()/60;
+  return plan().reduce((a,b)=>Math.abs(HEURE[b[0]]-h)<Math.abs(HEURE[a[0]]-h)?b:a)[0];
+}
+function recherche(){
+  const q=norm(S.q.trim()), qa=S.q.trim();
+  return aliments().filter(a=>(!S.cat||a[1]===S.cat)&&(!qa||norm(a[0]).includes(q)||nomDe(a).includes(qa)))
+    .sort((a,b)=>{ if(!qa) return nomDe(a).localeCompare(nomDe(b),S.lang);
+      const ia=norm(a[0]).indexOf(q), ib=norm(b[0]).indexOf(q);
+      return (ia<0?99:ia)-(ib<0?99:ib) || nomDe(a).localeCompare(nomDe(b),S.lang) });
+}
+
+/* ---------- base ---------- */
+function vBase(){
+  const liste=recherche();
+  return `
+  <div class="stack">
+    <div>
+      <p class="eyebrow">${t("reference")}</p>
+      <h1 style="font-size:26px">${t("tab_base")}</h1>
+      <p class="lede">${BASE.length} ${t("b_lede1")}${S.persos.length?` + ${S.persos.length} ${t("b_lede2")}`:""}, ${t("b_lede3")}</p>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <div class="field" style="flex:2 1 220px"><label for="b_q">${t("rechercher")}</label>
+          <input id="b_q" class="inp" type="search" value="${esc(S.q)}" autocomplete="off"></div>
+        <div class="field" style="flex:1 1 180px"><label for="b_cat">${t("categorie")}</label>
+          <select id="b_cat"><option value="">${t("toutes")} (${aliments().length})</option>${Object.keys(CATS).map(k=>
+            `<option value="${k}" ${S.cat===k?"selected":""}>${catNom(k)} (${aliments().filter(a=>a[1]===k).length})</option>`).join("")}</select></div>
+      </div>
+      <p class="hint" style="margin:10px 0 0">${ASSETS?t("photo_h"):t("photo_off")}
+        <a href="credits.html" target="_blank" rel="noopener" style="color:var(--steel)">${t("credits")}</a></p>
+    </div>
+
+    <div class="tw"><table>
+      <thead><tr><th colspan="2">${t("aliment")}</th><th>${t("categorie")}</th><th class="n">${t("kcal")}</th><th class="n">${t("prot_c")}</th><th class="n">${t("gluc_c")}</th><th class="n">${t("lip_c")}</th><th></th></tr></thead>
+      <tbody id="bbody">${blocBase(liste)}</tbody></table></div>
+
+    <div class="card">
+      <p class="eyebrow">${t("creer_aliment")}</p>
+      <p class="hint" style="margin:6px 0 10px">${t("creer_h")}</p>
+      <div class="row">
+        <div class="field" style="flex:2 1 180px"><label for="a_nom">${t("nom")}</label><input id="a_nom"></div>
+        <div class="field" style="flex:1 1 150px"><label for="a_cat">${t("categorie")}</label><select id="a_cat">${Object.keys(CATS).map(k=>`<option value="${k}">${catNom(k)}</option>`).join("")}</select></div>
+        <div class="field" style="flex:0 1 92px"><label for="a_kcal">${t("kcal")}</label><input id="a_kcal" type="number" min="0" max="900" step="1"></div>
+        <div class="field" style="flex:0 1 92px"><label for="a_p">${t("prot_c")}</label><input id="a_p" type="number" min="0" max="100" step="0.1"></div>
+        <div class="field" style="flex:0 1 92px"><label for="a_g">${t("gluc_c")}</label><input id="a_g" type="number" min="0" max="100" step="0.1"></div>
+        <div class="field" style="flex:0 1 92px"><label for="a_l">${t("lip_c")}</label><input id="a_l" type="number" min="0" max="100" step="0.1"></div>
+        <button class="btn" id="a_add">${t("creer")}</button>
+      </div>
+      <p class="hint" id="a_msg" style="margin:8px 0 0"></p>
+    </div>
+  </div>`;
+}
+function blocBase(liste){
+  return liste.map(a=>`<tr>
+    <td style="width:1%;padding-inline-end:0">${vignette(a)}</td>
+    <td>${esc(nomDe(a))}${a[6]?` <span class="chip a">${t("perso")}</span>`:""}</td>
+    <td style="color:var(--muted);font-size:13px">${catNom(a[1])}</td>
+    <td class="n"><b>${r0(a[2])}</b></td><td class="n">${r1(a[3])}</td><td class="n">${r1(a[4])}</td><td class="n">${r1(a[5])}</td>
+    <td class="e" style="width:1%">${a[6]?`<button class="del" data-delalim="${a[6]}" aria-label="${esc(nomDe(a))}">&times;</button>`:""}</td></tr>`).join("")
+    || `<tr><td colspan="8" style="color:var(--muted);padding:22px;text-align:center">${t("aucun_match_court")}</td></tr>`;
+}
+
+/* ---------- semaine ---------- */
+function vSemaine(c){
+  const js = S.jourSem===null ? jourSemDe(iso(new Date())) : S.jourSem;
+  const cible=c.kcal;
+  const jour=planDuJour(js);
+
+  if(!S.recettes.length) return `
+  <div class="stack">
+    <div><p class="eyebrow">${t("etape")} 3</p><h1 style="font-size:26px">${t("tab_semaine")}</h1>
+      <p class="lede">${t("sem_lede")}</p></div>
+    <div class="empty"><strong>${t("sem_sans_rec_t")}</strong>${t("sem_sans_rec")}</div>
+  </div>`;
+
+  return `
+  <div class="stack">
+    <div><p class="eyebrow">${t("etape")} 3</p><h1 style="font-size:26px">${t("tab_semaine")}</h1>
+      <p class="lede">${t("sem_lede")}</p></div>
+
+    <div class="tw"><table><thead><tr><th>${t("jour")}</th><th class="n">${t("kcal")}</th><th class="n">${t("prot_c")}</th><th class="n">${t("gluc_c")}</th><th class="n">${t("lip_c")}</th><th class="n">${t("sem_ecart")}</th></tr></thead><tbody>
+      ${JOURS_SEM.map((nom,i)=>{
+        const x=totauxJourPlan(i), vide=!planDuJour(i).length, d=x.kcal-cible;
+        return `<tr style="${i===js?"background:var(--surface-2)":""}">
+          <td><button class="exo" data-jour="${i}"><span class="lp" style="${i===js?"background:var(--accent)":""}"></span>${L(nom)}</button></td>
+          <td class="n">${vide?"—":r0(x.kcal)}</td><td class="n">${vide?"—":r0(x.p)}</td>
+          <td class="n">${vide?"—":r0(x.g)}</td><td class="n">${vide?"—":r0(x.l)}</td>
+          <td class="n" style="color:${vide?"var(--muted)":Math.abs(d)<=100?"var(--good)":"var(--warn)"}">${vide?"—":(d>0?"+":"")+r0(d)}</td></tr>`;
+      }).join("")}
+    </tbody></table></div>
+
+    <div class="card">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <div><p class="eyebrow">${L(JOURS_SEM[js])}</p>
+          <h3 style="font-size:17px;margin-top:3px"><span class="num">${r0(totauxJourPlan(js).kcal)}</span> ${t("sur")} ${cible} ${t("kcal")}</h3></div>
+        <button class="btn ghost mini" data-appliquer="${js}" ${jour.length?"":"disabled"}>${t("sem_appliquer")}</button>
+      </div>
+      <p class="hint" style="margin:8px 0 12px">${t("sem_appliquer_x")}</p>
+      <div class="tw" style="border:0"><table><tbody>
+        ${plan().map(([ri])=>{
+          const dedans=jour.filter(x=>x.ri===ri);
+          return `<tr><td style="white-space:nowrap;vertical-align:top"><b>${L(REPAS[ri])}</b></td>
+            <td>${dedans.length?dedans.map(x=>{
+                const r=recetteParId(x.rid);
+                return `<span class="chip a" style="margin:0 4px 4px 0;display:inline-block">${esc(r?r.nom:"?")}
+                  <button class="del" style="padding:0 2px;font-size:13px" data-delplan="${js}:${x.rid}:${ri}">&times;</button></span>`;
+              }).join(""):`<span class="hint">${t("sem_rien")}</span>`}</td>
+            <td style="width:1%;vertical-align:top">
+              <select data-addplan="${js}:${ri}" style="background:var(--surface-2);border:1px solid var(--line);border-radius:7px;padding:5px 8px">
+                <option value="">+ ${t("mode_recette")}</option>
+                ${S.recettes.map(r=>`<option value="${r.id}">${esc(r.nom)}</option>`).join("")}
+              </select></td></tr>`;
+        }).join("")}
+      </tbody></table></div>
+    </div>
+  </div>`;
+}
+
+/* ---------- montre & sante ---------- */
+function hhmm(min){ if(min==null) return "—"; const h=Math.floor(min/60); return `${h} h ${String(r0(min%60)).padStart(2,"0")}` }
+function km(m){ return m==null?"—":(m/1000).toFixed(2) }
+
+function blocComparaison(){
+  const lignes=comparaisons(10);
+  if(!lignes.length)
+    return `<div class="card"><p class="eyebrow">${t("cmp_t")}</p>
+      <p class="hint" style="margin:8px 0 0">${t("cmp_vide")}</p></div>`;
+  const avecMesure=lignes.filter(x=>x.mesure!=null);
+  const biais=avecMesure.length
+    ? r0(avecMesure.reduce((t,x)=>t+x.ecart,0)/avecMesure.length) : null;
+  return `<div class="card">
+    <p class="eyebrow">${t("cmp_t")}</p>
+    <p class="hint" style="margin:8px 0 12px">${t("cmp_x")}</p>
+    <div class="tw" style="border:0"><table>
+      <thead><tr><th>${t("date")}</th><th>${t("seance")}</th><th class="n">${t("duree")}</th>
+        <th class="n">${t("cmp_estime")}</th><th class="n">${t("cmp_mesure")}</th>
+        <th class="n">${t("cmp_ecart")}</th><th class="n">${t("cmp_retenu")}</th></tr></thead>
+      <tbody>${lignes.map(x=>`<tr>
+        <td class="n">${frDate(x.date)}</td>
+        <td>${x.types.map(y=>`<span class="chip${y==="cardio"?"":" a"}">${y==="cardio"?t("sport_cardio"):t("sport_muscu")}</span>`).join(" ")}</td>
+        <td class="n">${x.duree} min</td>
+        <td class="n">${x.estime}</td>
+        <td class="n">${x.mesure!=null?x.mesure:"—"}</td>
+        <td class="n" style="color:${x.ecart==null?"var(--muted)":Math.abs(x.ecart)<=20?"var(--good)":"var(--warn)"}">${x.ecart==null?"—":(x.ecart>0?"+":"")+x.ecart+" %"}</td>
+        <td class="n"><b>${x.retenu}</b></td></tr>`).join("")}</tbody></table></div>
+    ${biais!=null?`<p class="hint" style="margin:12px 0 0">${t("cmp_biais")}
+      <b style="color:${Math.abs(biais)<=20?"var(--good)":"var(--warn)"}">${biais>0?"+":""}${biais} %</b>.
+      ${biais>20?t("cmp_sous"):biais<-20?t("cmp_sur"):t("cmp_bon")}</p>`:""}
+  </div>`;
+}
+
+function vSante(){
+  const h=santeDuJour(iso(new Date()));
+  const derniers=[...Array(7)].map((_,k)=>{
+    const d=iso(new Date(Date.now()-k*864e5)); return {d, v:S.sante.jours[d]};
+  }).filter(x=>x.v);
+
+  const nbJours=Object.keys(S.sante.jours).length;
+  let tete;
+  if(S.santeEtat==="absent"){
+    tete=`<div class="empty"><strong>${t("s_absent_t")}</strong>${t("s_absent")}</div>`;
+  } else {
+    /* Un etat lisible plutot qu'un simple « rien trouve » : chaque ligne dit
+       ou en est la chaine, et le bouton mene la ou l'utilisateur doit agir. */
+    const ligne=(nom,valeur,bon)=>`<div class="macro" style="grid-template-columns:1fr auto">
+      <div class="nm">${nom}</div>
+      <div class="vl" style="color:${bon?"var(--good)":"var(--warn)"}">${valeur}</div></div>`;
+    const hc = S.sante.raison==="ok" ? [t("diag_installe"),true]
+             : S.sante.raison==="mise_a_jour" ? [t("diag_maj"),false]
+             : [t("diag_absent"),false];
+    const autorise = S.santeEtat==="connecte";
+    const manque = (S.sante.manquantes||[]).length;
+    tete=`<div class="card">
+      <p class="eyebrow">${t("diag")}</p>
+      <div style="margin-top:8px">
+        ${ligne("Health Connect",hc[0],hc[1])}
+        ${hc[1]?ligne(t("diag_autor"), autorise?t("diag_ok"):(manque?`${manque} ${t("diag_manque")}`:t("diag_non")), autorise):""}
+        ${autorise?ligne(t("diag_jours"), nbJours?`${nbJours}`:t("diag_zero"), nbJours>0):""}
+      </div>
+      <div class="row" style="margin-top:14px">
+        ${S.santeEtat==="a_autoriser"?`<button class="btn" id="s_ok">${t("s_autoriser")}</button>`:""}
+        <button class="btn ghost" id="s_reglages">${hc[1]?t("ouvrir_hc"):t("installer_hc")}</button>
+      </div>
+      ${!hc[1]?`<p class="hint" style="margin:10px 0 0">${t("s_indispo")}</p>`:""}
+      ${hc[1]&&autorise&&!nbJours?`<p class="hint" style="margin:10px 0 0">${t("diag_vide")}</p>`:""}
+    </div>`;
+  }
+
+  /* Chaque application de sante a son propre chemin vers Health Connect.
+     Une seule fait exception : Huawei, qui n'y ecrit pas du tout. */
+  const MARQUES=[
+    ["Samsung Health", true,  ["Parametres, puis Health Connect, puis autorise les donnees.",
+                               "الإعدادات، ثم Health Connect، ثم اسمح بالبيانات."]],
+    ["Google Fit",     true,  ["Profil, Parametres, puis Health Connect.",
+                               "الملف الشخصي، الإعدادات، ثم Health Connect."]],
+    ["Fitbit",         true,  ["Compte, puis Health Connect.",
+                               "الحساب، ثم Health Connect."]],
+    ["Garmin Connect", true,  ["Parametres, puis Health Connect.",
+                               "الإعدادات، ثم Health Connect."]],
+    ["Huawei Sante",   false, ["N'ecrit pas dans Health Connect. Voir ci-dessous.",
+                               "لا يكتب في Health Connect. انظر أدناه."]]
+  ];
+  const sources=`<div class="card">
+    <p class="eyebrow">${t("brancher")}</p>
+    <p class="hint" style="margin:8px 0 12px">${t("brancher_x")}</p>
+    <div class="tw" style="border:0"><table><tbody>
+      ${MARQUES.map(([nom,direct,txt])=>`<tr>
+        <td style="white-space:nowrap"><b>${nom}</b></td>
+        <td><span class="chip${direct?"":" a"}">${direct?t("direct"):t("via_relais")}</span></td>
+        <td style="color:var(--muted);font-size:13px">${L(txt)}</td></tr>`).join("")}
+    </tbody></table></div>
+    <p class="hint" style="margin:12px 0 0">${t("hc_version")}</p>
+  </div>
+  <div class="note warn">
+    <b>${t("huawei_t")}</b> ${t("huawei_x")}
+    <ol style="margin:8px 0 0;padding-inline-start:20px">
+      ${[t("huawei_1"),t("huawei_2"),t("huawei_3")].map(x=>`<li style="margin-bottom:4px">${x}</li>`).join("")}
+    </ol>
+    <p style="margin:8px 0 0">${t("huawei_iphone")}</p>
+  </div>`;
+
+  const tuiles = S.santeEtat==="connecte" ? `
+    <div class="grid g3">
+      <div class="kpi hero"><div class="k">${h?r0(h.kcal):"—"}<span class="u"> ${t("kcal")}</span></div><div class="n">${t("kcal_actives")}</div></div>
+      <div class="kpi"><div class="k">${h?km(h.dist):"—"}<span class="u"> km</span></div><div class="n">${t("distance")}</div></div>
+      <div class="kpi"><div class="k">${h?hhmm(h.sommeil):"—"}</div><div class="n">${t("sommeil")}</div></div>
+      <div class="kpi"><div class="k">${h&&h.fc?r0(h.fc):"—"}<span class="u"> bpm</span></div><div class="n">${t("fc_moy")}</div></div>
+      <div class="kpi"><div class="k">${h&&h.pas?r0(h.pas):"—"}</div><div class="n">${t("pas")}</div></div>
+    </div>
+    <div class="card">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <div><p class="eyebrow">${t("s_dyn")}</p>
+          <label style="display:flex;gap:9px;align-items:center;margin-top:8px;cursor:pointer">
+            <input type="checkbox" id="s_dyn" ${S.sante.cibleDyn?"checked":""}>
+            <span style="font-size:14px">${t("s_dyn")}</span></label></div>
+        <button class="btn ghost mini" id="s_maj">${t("s_rafraichir")}</button>
+      </div>
+      <p class="hint" style="margin:10px 0 0">${t("s_dyn_x")}</p>
+      ${S.sante.maj?`<p class="hint" style="margin:6px 0 0">${t("s_maj")} : ${new Date(S.sante.maj).toLocaleString(S.lang==="ar"?"ar-MA-u-nu-latn":"fr-FR")}${S.sante.source?` · ${esc(S.sante.source)}`:""}</p>`:""}
+    </div>
+    ${blocComparaison()}
+    <div>
+      <h3 style="font-size:17px;margin-bottom:10px">${t("s_7j")}</h3>
+      ${derniers.length?`<div class="tw"><table>
+        <thead><tr><th>${t("date")}</th><th class="n">${t("kcal_actives")}</th><th class="n">${t("distance")}</th><th class="n">${t("sommeil")}</th><th class="n">${t("fc_moy")}</th><th class="n">${t("pas")}</th></tr></thead>
+        <tbody>${derniers.map(x=>`<tr><td class="n">${frDate(x.d)}</td>
+          <td class="n">${r0(x.v.kcal||0)}</td><td class="n">${km(x.v.dist)}</td>
+          <td class="n">${hhmm(x.v.sommeil)}</td><td class="n">${x.v.fc?r0(x.v.fc):"—"}</td>
+          <td class="n">${x.v.pas?r0(x.v.pas):"—"}</td></tr>`).join("")}</tbody></table></div>`
+        :`<div class="empty">${t("s_rien")}</div>`}
+    </div>` : "";
+
+  return `
+  <div class="stack">
+    <div>
+      <p class="eyebrow">${t("etape")} 5</p>
+      <h1 style="font-size:26px">${t("s_h1")}</h1>
+      <p class="lede">${t("s_lede")}</p>
+    </div>
+    ${tete}
+    ${S.santeEtat!=="absent"?sources:""}
+    ${tuiles}
+    <div class="card">
+      <p class="eyebrow">${t("s_sources")}</p>
+      <div class="row" style="gap:7px;margin:10px 0">
+        ${["Huawei Sante","Samsung Health","Google Fit","Fitbit","Garmin","Apple Sante","Health Connect"]
+          .map(s=>`<span class="chip">${s}</span>`).join("")}
+      </div>
+      <p class="hint" style="margin:0">${t("s_sources_x")}</p>
+    </div>
+  </div>`;
+}
+
+/* ---------- entrainement ---------- */
+/* Estimation de depense : met x poids x heures. Honnete a +/- 20 %, suffisant pour doser.
+   Le met est l'equivalent metabolique de l'effort, mesure en laboratoire par type d'activite. */
+function kcalCardio(met,minutes){ return r0(met*S.profil.poids*(minutes/60)) }
+
+/* En musculation, le met depend surtout de la densite de la seance : les temps de repos
+   comptent dans la duree mais pas dans l'effort, d'ou trois niveaux plutot qu'une valeur. */
+const INTENSITES={
+  legere:{met:3.5,t:["Legere — technique, repos longs","خفيفة — تقنية، راحة طويلة"]},
+  moderee:{met:5,  t:["Moderee — hypertrophie classique","متوسطة — تضخيم كلاسيكي"]},
+  intense:{met:6,  t:["Intense — lourd ou peu de repos","مكثفة — أوزان ثقيلة أو راحة قصيرة"]}
+};
+function kcalSeance(s){
+  if(s.kcal!=null) return s.kcal;
+  if(s.type==="cardio"){ const c=CARDIOS[s.prog]; return c?kcalCardio(c.met,s.duree||0):0 }
+  const i=INTENSITES[s.intensite||"moderee"];
+  return kcalCardio(i.met,s.duree||0);
+}
+
+function vCardio(){
+  const cd=CARDIOS[S.cardio];
+  const faites=S.seances.filter(s=>s.type==="cardio");
+  return `
+  <div class="stack">
+    <div>
+      <p class="eyebrow">${t("etape")} 5</p>
+      <h1 style="font-size:26px">${t("c_h1")}</h1>
+      <p class="lede">${t("c_lede")}</p>
+    </div>
+
+    ${blocSport()}
+
+    <div class="row" style="gap:6px">
+      ${Object.entries(CARDIOS).map(([k,p])=>`<button class="btn ${S.cardio===k?"":"ghost"} mini" data-cardio="${k}">${L(p.t)}</button>`).join("")}
+    </div>
+
+    <div class="note">${L(cd.n)}</div>
+
+    <div class="grid g2">
+      ${cd.seances.map((s,si)=>`<div class="card">
+        <h3 style="font-size:16px;margin-bottom:10px">${L(s.t)}</h3>
+        <div class="tw" style="border:0"><table><tbody>
+          ${s.blocs.map(([quoi,combien])=>`<tr><td>${esc(quoi)}</td><td class="n" style="white-space:nowrap">${esc(combien)}</td></tr>`).join("")}
+        </tbody></table></div>
+        <button class="btn ghost mini" style="margin-top:10px" data-logcardio="${si}">${t("noter_seance")}</button>
+      </div>`).join("")}
+    </div>
+
+    <div id="cardiozone">${S.logCardio!==null?formCardio(S.logCardio):""}</div>
+
+    <div>
+      <h3 style="font-size:17px;margin-bottom:10px">${t("historique")}</h3>
+      ${faites.length?`<div class="tw"><table><thead><tr><th>${t("date")}</th><th>${t("seance")}</th><th class="n">${t("duree")}</th><th class="n">${t("dist_km")}</th><th class="n">${t("kcal")}</th><th></th></tr></thead><tbody>
+        ${faites.map(s=>`<tr><td class="n">${frDate(s.date)}</td>
+          <td>${esc(titreCardio(s))}</td><td class="n">${s.duree} min</td>
+          <td class="n">${s.distance?r1(s.distance):"—"}</td><td class="n">${s.kcal||"—"}</td>
+          <td class="e" style="width:1%"><button class="del" data-delseance="${s.id}" aria-label="${frDate(s.date)}">&times;</button></td></tr>`).join("")}
+      </tbody></table></div>`
+      :`<div class="empty"><strong>${t("hist_vide_t")}</strong>${t("c_hist_vide")}</div>`}
+    </div>
+  </div>`;
+}
+function titreCardio(s){
+  const p=CARDIOS[s.prog];
+  if(!p) return s.titre||"";
+  return `${L(p.seances[s.si]?p.seances[s.si].t:p.t)} — ${L(p.t)}`;
+}
+function formCardio(si){
+  const cd=CARDIOS[S.cardio], s=cd.seances[si];
+  return `<div class="card" style="border-color:var(--accent)">
+    <p class="eyebrow">${t("noter")} — ${L(s.t)} · ${L(cd.t)}</p>
+    <div class="row" style="margin-top:12px">
+      <div class="field" style="flex:0 1 160px"><label for="cd_date">${t("date")}</label>
+        <input id="cd_date" type="date" value="${iso(new Date())}" max="${iso(new Date())}"></div>
+      <div class="field" style="flex:0 1 120px"><label for="cd_duree">${t("duree")}</label>
+        <input id="cd_duree" type="number" min="1" max="600" step="5" value="45"></div>
+      <div class="field" style="flex:0 1 130px"><label for="cd_dist">${t("dist_km")}</label>
+        <input id="cd_dist" type="number" min="0" max="500" step="0.1"></div>
+      <button class="btn" id="cd_save" data-si="${si}">${t("enreg_seance")}</button>
+      <button class="btn ghost" id="cd_cancel">${t("annuler")}</button>
+    </div>
+    <p class="hint" id="cd_apercu" style="margin:10px 0 0">${t("c_estim")} <span class="num">${kcalCardio(cd.met,45)}</span> ${t("kcal")} ${t("c_pour")} 45 min ${t("c_a")} ${r1(S.profil.poids)} ${t("kg")}.</p>
+  </div>`;
+}
+function blocSport(){
+  return `<div class="row" style="gap:6px">
+    <button class="btn ${S.sport==="muscu"?"":"ghost"}" data-sport="muscu">${t("sport_muscu")}</button>
+    <button class="btn ${S.sport==="cardio"?"":"ghost"}" data-sport="cardio">${t("sport_cardio")}</button>
+  </div>`;
+}
+
+function vEntrainement(){
+  if(S.sport==="cardio") return vCardio();
+  const pg=PROGS[S.prog];
+  const derniere=exo=>{
+    for(const s of S.seances){ const l=(s.lignes||[]).find(x=>x.exo===exo && x.charge);
+      if(l) return `${r1(l.charge)} × ${l.reps}` }
+    return null;
+  };
+  return `
+  <div class="stack">
+    <div>
+      <p class="eyebrow">${t("etape")} 4</p>
+      <h1 style="font-size:26px">${t("e_h1")}</h1>
+      <p class="lede">${t("e_lede")}</p>
+    </div>
+
+    ${blocSport()}
+
+    <div class="row" style="gap:6px">
+      ${Object.entries(PROGS).map(([k,p])=>`<button class="btn ${S.prog===k?"":"ghost"} mini" data-prog="${k}">${L(p.t)}</button>`).join("")}
+    </div>
+
+    <div class="note">${L(pg.n)}</div>
+
+    <div class="grid g2">
+      ${pg.jours.map((j,ji)=>`<div class="card">
+        <h3 style="font-size:16px;margin-bottom:10px">${L(j.t)}</h3>
+        <div class="tw" style="border:0"><table><thead><tr><th>${t("exercice")}</th><th class="n">${t("series")}</th><th class="n">${t("repos")}</th><th class="n">${t("dernier")}</th></tr></thead><tbody>
+        ${j.ex.map(([e,s,r])=>`<tr><td>${EXO_MOTIF[e]
+            ? `<button class="exo" data-mv="${esc(e)}" title="${t("voir_mvt")}"><span class="lp"></span>${nomEx(e)}</button>`
+            : nomEx(e)}</td><td class="n">${trSerie(s)}</td><td class="n" style="color:var(--muted)">${trSerie(r)}</td>
+          <td class="n" style="color:${derniere(e)?"var(--steel)":"var(--muted)"}">${derniere(e)||"—"}</td></tr>`).join("")}
+        </tbody></table></div>
+        <button class="btn ghost mini" style="margin-top:10px" data-log="${ji}">${t("noter_seance")}</button>
+      </div>`).join("")}
+    </div>
+
+    <p class="hint">${t("mv_aide")}</p>
+    <div id="mvzone">${S.mv?blocMouvement(S.mv):""}</div>
+    <div id="logzone"></div>
+
+    <div>
+      <h3 style="font-size:17px;margin-bottom:10px">${t("historique")}</h3>
+      ${S.seances.filter(s=>s.type!=="cardio").length?`<div class="tw"><table><thead><tr><th>${t("date")}</th><th>${t("seance")}</th><th class="n">${t("kcal")}</th><th>${t("charges")}</th><th></th></tr></thead><tbody>
+        ${S.seances.filter(s=>s.type!=="cardio").map(s=>`<tr><td class="n">${frDate(s.date)}</td><td>${esc(titreSeance(s))}</td>
+          <td class="n">${s.duree?`${r0(kcalSeance(s))}`:"—"}</td>
+          <td style="font-size:13px;color:var(--muted)">${(s.lignes||[]).filter(l=>l.charge).map(l=>`${esc(nomEx(l.exo))} <span class="num">${r1(l.charge)}×${l.reps}</span>`).join(" · ")||"—"}</td>
+          <td class="e" style="width:1%"><button class="del" data-delseance="${s.id}" aria-label="${frDate(s.date)}">&times;</button></td></tr>`).join("")}
+      </tbody></table></div>`
+      :`<div class="empty"><strong>${t("hist_vide_t")}</strong>${t("hist_vide")}</div>`}
+    </div>
+  </div>`;
+}
+function blocMouvement(exo){
+  const cle=EXO_MOTIF[exo]; if(!cle) return "";
+  const m=MOTIFS[cle];
+  const memes=Object.keys(EXO_MOTIF).filter(e=>EXO_MOTIF[e]===cle&&e!==exo);
+  return `<div class="card" style="border-color:var(--accent)">
+    <div class="row" style="justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+      <div><p class="eyebrow">${L(m.t)}</p><h3 style="font-size:18px;margin-top:2px">${nomEx(exo)}</h3></div>
+      <button class="btn ghost mini" id="mv_close">${t("fermer")}</button>
+    </div>
+    <div class="mvcard">
+      <div class="fig">${figure(cle,true)}</div>
+      <div class="txt">
+        <p style="margin:0 0 10px">${L(m.cue)}</p>
+        ${memes.length?`<p class="hint" style="margin:0">${t("mv_meme")} ${memes.map(e=>esc(nomEx(e))).join(" · ")}</p>`:""}
+      </div>
+    </div>
+  </div>`;
+}
+function titreSeance(s){
+  const pg=PROGS[s.prog]; if(!pg||s.ji===undefined) return s.titre||"";
+  return `${L(pg.jours[s.ji].t)} — ${L(pg.t)}`;
+}
+function formLog(ji){
+  const pg=PROGS[S.prog], j=pg.jours[ji];
+  return `<div class="card" style="border-color:var(--accent)">
+    <p class="eyebrow">${t("noter")} — ${L(j.t)} · ${L(pg.t)}</p>
+    <div class="row" style="margin:10px 0">
+      <div class="field" style="flex:0 1 160px"><label for="s_date">${t("date")}</label>
+        <input id="s_date" type="date" value="${iso(new Date())}" max="${iso(new Date())}"></div>
+      <div class="field" style="flex:0 1 120px"><label for="s_duree">${t("duree")}</label>
+        <input id="s_duree" type="number" min="5" max="300" step="5" value="60"></div>
+      <div class="field" style="flex:1 1 220px"><label for="s_int">${t("intensite")}</label>
+        <select id="s_int">${Object.entries(INTENSITES).map(([k,v])=>
+          `<option value="${k}" ${k==="moderee"?"selected":""}>${L(v.t)}</option>`).join("")}</select></div>
+    </div>
+    <p class="hint" id="s_apercu" style="margin:0 0 12px">${t("c_estim")} <span class="num">${kcalCardio(INTENSITES.moderee.met,60)}</span> ${t("kcal")} ${t("c_pour")} 60 min ${t("c_a")} ${r1(S.profil.poids)} ${t("kg")}.</p>
+    <div class="tw" style="border:0"><table><thead><tr><th>${t("exercice")}</th><th class="n">${t("charge")}</th><th class="n">${t("reps")}</th></tr></thead><tbody>
+    ${j.ex.map(([e],i)=>`<tr><td>${nomEx(e)}</td>
+      <td class="n"><input class="inp" style="width:92px;text-align:end" type="number" step="0.5" min="0" max="500" data-charge="${i}"></td>
+      <td class="n"><input class="inp" style="width:78px;text-align:end" type="number" step="1" min="0" max="100" data-reps="${i}"></td></tr>`).join("")}
+    </tbody></table></div>
+    <div class="row" style="margin-top:12px"><button class="btn" id="s_save" data-ji="${ji}">${t("enreg_seance")}</button>
+      <button class="btn ghost" id="s_cancel">${t("annuler")}</button></div>
+    <p class="hint" style="margin:8px 0 0">${t("noter_h")}</p>
+  </div>`;
+}
+
+/* ============================ INTERACTIONS ============================ */
+function lireProfil(){
+  const g=id=>document.getElementById(id);
+  if(!g("f_poids")) return;
+  const n=(id,d)=>{const v=parseFloat(g(id).value);return isFinite(v)?v:d};
+  S.profil={sexe:g("f_sexe").value,age:n("f_age",30),taille:n("f_taille",175),
+    poids:n("f_poids",75),cible:n("f_cible",72),activite:g("f_activite").value,
+    objectif:g("f_objectif").value,rythme:g("f_rythme").value,
+    protKg:n("f_prot",2),lipKg:n("f_lip",0.9)};
+  S.profilCharge=true;
+}
+let tSave=0;
+function sauveProfilDiffere(){ clearTimeout(tSave); tSave=setTimeout(sauveProfil,700) }
+function majListe(){
+  const h=document.getElementById("hits");
+  if(h) h.innerHTML=blocHits(recherche().slice(0,40),S.sel);
+  const b=document.getElementById("bbody");
+  if(b) b.innerHTML=blocBase(recherche());
+}
+function majProfil(){
+  const c=calculs(S.profil);
+  document.getElementById("hdPoids").textContent=r1(S.profil.poids)+" "+t("kg");
+  document.getElementById("hdKcal").textContent=c.kcal;
+  const r=document.getElementById("res"); if(r) r.innerHTML=blocResultats(c);
+  const ry=document.getElementById("f_rythme"); if(ry) ry.disabled=(S.profil.objectif==="maintien");
+}
+
+document.addEventListener("input",e=>{
+  const x=e.target;
+  if(x.id&&x.id.startsWith("f_")){ lireProfil(); majProfil(); sauveProfilDiffere(); return }
+  if(x.id==="n_q"||x.id==="b_q"){ S.q=x.value; majListe(); return }
+  if(x.id==="n_qte"){ const a=S.sel,q=parseFloat(x.value)||0,ap=document.getElementById("n_apercu");
+    if(a&&ap) ap.innerHTML=apercu(a,q) }
+  if(x.id==="cd_duree"){
+    const cd=CARDIOS[S.cardio], m=parseFloat(x.value)||0, ap=document.getElementById("cd_apercu");
+    if(ap) ap.innerHTML=`${t("c_estim")} <span class="num">${kcalCardio(cd.met,m)}</span> ${t("kcal")} ${t("c_pour")} ${r0(m)} min ${t("c_a")} ${r1(S.profil.poids)} ${t("kg")}.`;
+  }
+  if(x.id==="s_duree") majApercuMuscu();
+});
+function majApercuMuscu(){
+  const d=document.getElementById("s_duree"), i=document.getElementById("s_int"),
+        ap=document.getElementById("s_apercu");
+  if(!d||!i||!ap) return;
+  const m=parseFloat(d.value)||0;
+  ap.innerHTML=`${t("c_estim")} <span class="num">${kcalCardio(INTENSITES[i.value].met,m)}</span> ${t("kcal")} ${t("c_pour")} ${r0(m)} min ${t("c_a")} ${r1(S.profil.poids)} ${t("kg")}.`;
+}
+document.addEventListener("change",e=>{
+  if(e.target.id==="n_cat"||e.target.id==="b_cat"){ S.cat=e.target.value; majListe() }
+  if(e.target.id==="s_int") majApercuMuscu();
+  if(e.target.id==="r_nb"){ S.profil.nbRepas=+e.target.value; majProfil(); sauveProfilDiffere() }
+  if(e.target.id==="s_dyn"){ S.sante.cibleDyn=e.target.checked; rend();
+    ecrire(doc=>doc.set({profil:S.profil,photos:S.photos,sante:S.sante})) }
+  /* ajouter un repas a une case du plan hebdomadaire */
+  const ajout=e.target.dataset && e.target.dataset.addplan;
+  if(ajout && e.target.value){
+    const [js,ri]=ajout.split(":");
+    S.semaine[js]=(S.semaine[js]||[]).concat([{ri:+ri,rid:e.target.value}]);
+    rend();
+    ecrire(doc=>doc.set({profil:S.profil,photos:S.photos,sante:S.sante,semaine:S.semaine}));
+  }
+});
+
+document.addEventListener("click",async e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  const d=b.dataset;
+
+  if(d.lang){ S.lang=d.lang; try{localStorage.setItem("fm_lang",d.lang)}catch(_){} rend(); return }
+  if(d.tab){ S.tab=d.tab; S.sel=null; rend(); return }
+  if(d.prog){ S.prog=d.prog; rend(); return }
+  if(d.sport){ S.sport=d.sport; S.mv=null; S.logCardio=null; rend(); return }
+  if(d.cardio){ S.cardio=d.cardio; S.logCardio=null; rend(); return }
+  if(d.mode){ S.modeAjout=d.mode; S.sel=null; rend(); return }
+  if(d.jour!==undefined){ S.jourSem=+d.jour; rend(); return }
+
+  /* --- repas composes --- */
+  if(d.nommer!==undefined){ S.nommeRecette=+d.nommer; rend();
+    const f=document.getElementById("rec_nom"); if(f) f.focus(); return }
+  if(b.id==="rec_annule"){ S.nommeRecette=null; rend(); return }
+  if(d.creerec!==undefined){
+    const ri=+d.creerec, champ=document.getElementById("rec_nom");
+    const nom=(champ&&champ.value.trim())||"";
+    if(!nom){ if(champ) champ.focus(); return }
+    const e=(S.journal[S.jour]||{entrees:[]}).entrees||[];
+    const items=e.filter(x=>x.ri===ri).map(x=>({nom:x.nom,qte:x.qte}));
+    if(!items.length) return;
+    const id=nouvelId();
+    S.recettes=S.recettes.concat([{id,nom,items}]);
+    S.nommeRecette=null; rend();
+    await ecrire(doc=>doc.collection("recettes").doc(id).set({nom,items})); return;
+  }
+  if(d.delrec){
+    S.recettes=S.recettes.filter(r=>r.id!==d.delrec);
+    for(const js of Object.keys(S.semaine))
+      S.semaine[js]=S.semaine[js].filter(x=>x.rid!==d.delrec);
+    rend();
+    await ecrire(doc=>doc.collection("recettes").doc(d.delrec).delete()); return;
+  }
+  if(d.addrec){
+    const r=recetteParId(d.addrec); if(!r) return;
+    const q=parseFloat(document.getElementById("rq_"+d.addrec).value)||1;
+    const ri=+document.getElementById("rp_"+d.addrec).value;
+    const {doc:j}=versJournal(r,S.jour,ri,q);
+    rend();
+    await ecrire(doc=>doc.collection("journal").doc(S.jour).set(j)); return;
+  }
+
+  /* --- plan de la semaine --- */
+  if(d.delplan){
+    const [js,rid,ri]=d.delplan.split(":");
+    S.semaine[js]=(S.semaine[js]||[]).filter(x=>!(x.rid===rid&&x.ri===+ri));
+    rend();
+    await ecrire(doc=>doc.set({profil:S.profil,photos:S.photos,sante:S.sante,semaine:S.semaine})); return;
+  }
+  if(d.appliquer!==undefined){
+    const js=+d.appliquer; let total=0, j=null;
+    for(const e of planDuJour(js)){
+      const r=recetteParId(e.rid); if(!r) continue;
+      const res=versJournal(r,S.jour,e.ri,1); j=res.doc; total+=res.n;
+    }
+    if(!j) return;
+    S.tab="nutrition"; rend();
+    await ecrire(doc=>doc.collection("journal").doc(S.jour).set(j)); return;
+  }
+
+  /* --- seance cardio --- */
+  if(d.logcardio!==undefined){
+    S.logCardio=+d.logcardio; rend();
+    const z=document.getElementById("cardiozone"); if(z) z.scrollIntoView({behavior:"smooth",block:"center"});
+    return;
+  }
+  if(b.id==="cd_cancel"){ S.logCardio=null; rend(); return }
+  if(b.id==="cd_save"){
+    const si=+b.dataset.si, cd=CARDIOS[S.cardio];
+    const date=document.getElementById("cd_date").value||iso(new Date());
+    const duree=parseFloat(document.getElementById("cd_duree").value);
+    if(!isFinite(duree)||duree<=0) return;
+    const dist=parseFloat(document.getElementById("cd_dist").value);
+    const id=nouvelId();
+    const s={type:"cardio",date,prog:S.cardio,si,duree,
+             distance:isFinite(dist)?dist:null,kcal:kcalCardio(cd.met,duree)};
+    S.seances=[{id,...s}].concat(S.seances).sort((a,b)=>a.date<b.date?1:-1);
+    S.logCardio=null; rend();
+    await ecrire(doc=>doc.collection("seances").doc(id).set(s)); return;
+  }
+
+  if(b.id==="s_ok"){
+    const p=pontSante(); if(!p) return;
+    try{ const ok=await p.permissions(); S.santeEtat=ok?"connecte":"a_autoriser"; if(ok) await litSante() }
+    catch(err){ console.warn("permissions sante",err) }
+    rend(); return;
+  }
+  if(b.id==="s_reglages"){
+    const p=pontSante(); if(!p||!p.ouvrirReglages) return;
+    try{ await p.ouvrirReglages() }catch(err){ console.warn("reglages sante",err) }
+    return;
+  }
+  if(b.id==="s_maj"){
+    b.disabled=true;
+    try{ await litSante() }catch(err){ console.warn("lecture sante",err) }
+    rend(); return;
+  }
+
+  if(d.mv){ S.mv=d.mv; rend();
+    const z=document.getElementById("mvzone"); if(z) z.scrollIntoView({behavior:"smooth",block:"nearest"}); return }
+  if(b.id==="mv_close"){ S.mv=null; rend(); return }
+
+  if(d.photo){ e.stopPropagation(); S.pendPhoto=d.photo; document.getElementById("fileIn").click(); return }
+
+  if(b.id==="p_add"){
+    const dt=document.getElementById("p_date").value, v=parseFloat(document.getElementById("p_val").value);
+    if(!dt||!isFinite(v)||v<35||v>250) return;
+    S.pesees=S.pesees.filter(x=>x.date!==dt).concat([{date:dt,poids:v}]).sort((a,b)=>a.date<b.date?-1:1);
+    if(dt===S.pesees[S.pesees.length-1].date){ S.profil.poids=v; sauveProfilDiffere() }
+    rend();
+    await ecrire(doc=>doc.collection("pesees").doc(dt).set({date:dt,poids:v}));
+    return;
+  }
+  if(d.delpesee){
+    S.pesees=S.pesees.filter(x=>x.date!==d.delpesee); rend();
+    await ecrire(doc=>doc.collection("pesees").doc(d.delpesee).delete()); return;
+  }
+
+  if(b.id==="j_prev"||b.id==="j_next"){
+    const dt=new Date(S.jour+"T12:00:00"); dt.setDate(dt.getDate()+(b.id==="j_next"?1:-1));
+    S.jour=iso(dt); rend(); return;
+  }
+  if(b.id==="j_today"){ S.jour=iso(new Date()); rend(); return }
+  if(d.pick!==undefined){ S.sel=recherche()[+d.pick]; rend(); return }
+  if(b.id==="n_add"){
+    const a=S.sel; if(!a) return;
+    const qte=parseFloat(document.getElementById("n_qte").value);
+    if(!isFinite(qte)||qte<=0) return;
+    const ri=+document.getElementById("n_repas").value;
+    const j=S.journal[S.jour]||{date:S.jour,v:2,entrees:[]};
+    j.entrees=(j.entrees||[]).concat([{id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+      nom:a[0],ri,qte,kcal:a[2],p:a[3],g:a[4],l:a[5]}]);
+    S.journal[S.jour]=j; S.sel=null; rend();
+    await ecrire(doc=>doc.collection("journal").doc(S.jour).set(j)); return;
+  }
+  if(d.delentree){
+    const j=S.journal[S.jour]; if(!j) return;
+    j.entrees=j.entrees.filter(x=>x.id!==d.delentree); rend();
+    await ecrire(doc=>doc.collection("journal").doc(j.date||S.jour).set(j)); return;
+  }
+
+  if(b.id==="a_add"){
+    const g=id=>document.getElementById(id), msg=g("a_msg");
+    const nom=g("a_nom").value.trim(), kcal=parseFloat(g("a_kcal").value);
+    if(!nom||!isFinite(kcal)){ msg.textContent=t("creer_err"); return }
+    const al={nom,nomAr:nom,cat:g("a_cat").value,kcal,p:parseFloat(g("a_p").value)||0,
+      g:parseFloat(g("a_g").value)||0,l:parseFloat(g("a_l").value)||0};
+    const id=Date.now().toString(36);
+    S.persos=S.persos.concat([{id,...al}]);
+    rend(); document.getElementById("a_msg").textContent=`« ${nom} » ${t("creer_ok")}`;
+    await ecrire(doc=>doc.collection("aliments").doc(id).set(al)); return;
+  }
+  if(d.delalim){
+    S.persos=S.persos.filter(x=>x.id!==d.delalim); rend();
+    await ecrire(doc=>doc.collection("aliments").doc(d.delalim).delete()); return;
+  }
+
+  if(d.log!==undefined){
+    const z=document.getElementById("logzone");
+    z.innerHTML=formLog(+d.log); z.scrollIntoView({behavior:"smooth",block:"center"}); return;
+  }
+  if(b.id==="s_cancel"){ document.getElementById("logzone").innerHTML=""; return }
+  if(b.id==="s_save"){
+    const ji=+b.dataset.ji, j=PROGS[S.prog].jours[ji];
+    const date=document.getElementById("s_date").value||iso(new Date());
+    const lignes=j.ex.map(([ex],i)=>{
+      const ch=parseFloat(document.querySelector(`[data-charge="${i}"]`).value);
+      const rp=parseFloat(document.querySelector(`[data-reps="${i}"]`).value);
+      return isFinite(ch)?{exo:ex,charge:ch,reps:isFinite(rp)?rp:0}:null;
+    }).filter(Boolean);
+    if(!lignes.length) return;
+    const duree=parseFloat(document.getElementById("s_duree").value)||60;
+    const intensite=document.getElementById("s_int").value;
+    const id=nouvelId();
+    const s={date,prog:S.prog,ji,lignes,duree,intensite,
+             kcal:kcalCardio(INTENSITES[intensite].met,duree)};
+    S.seances=[{id,...s}].concat(S.seances).sort((a,b)=>a.date<b.date?1:-1);
+    rend();
+    await ecrire(doc=>doc.collection("seances").doc(id).set(s)); return;
+  }
+  if(d.delseance){
+    S.seances=S.seances.filter(x=>x.id!==d.delseance); rend();
+    await ecrire(doc=>doc.collection("seances").doc(d.delseance).delete()); return;
+  }
+});
+
+/* --- envoi d'une photo --- */
+document.getElementById("fileIn").addEventListener("change",async e=>{
+  const f=e.target.files&&e.target.files[0], cle=S.pendPhoto;
+  e.target.value=""; S.pendPhoto=null;
+  if(!f||!cle||!ASSETS) return;
+  try{
+    const res=await ASSETS.upload(f);
+    S.photos={...S.photos,[cle]:res.id};
+    rend();
+    await sauveProfil();
+  }catch(err){
+    console.warn("upload refuse",err);
+    const m=document.getElementById("a_msg"); if(m) m.textContent=t("photo_err");
+  }
+});
+
+chargeLocal();
+rend();
+connecte();
+brancheSante();
+</script>
+
+</body>
+</html>
