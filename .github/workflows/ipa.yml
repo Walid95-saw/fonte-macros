@@ -12,7 +12,8 @@ name: IPA iOS
 on:
   workflow_dispatch:        # lancement a la main depuis l'onglet Actions
   push:
-    tags: ['v*']            # ou automatiquement sur une etiquette de version
+    branches: ['main']      # et automatiquement a chaque envoi sur la branche principale
+    tags: ['v*']
 
 jobs:
   construire:
