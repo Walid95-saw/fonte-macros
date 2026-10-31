@@ -4,8 +4,7 @@
 # proprietaire de l'appareil peut creer. L'IPA produit ici est resigne au moment
 # de l'installation par Sideloadly ou AltStore, avec un identifiant Apple gratuit.
 #
-# Les runners macOS sont gratuits sur un depot public. Sur un depot prive, ils
-# consomment les minutes offertes dix fois plus vite.
+# Les runners macOS sont gratuits sur un depot public.
 
 name: IPA iOS
 
@@ -19,6 +18,8 @@ jobs:
   construire:
     runs-on: macos-14
     timeout-minutes: 45
+    permissions:
+      contents: write       # necessaire pour creer la release
 
     steps:
       - uses: actions/checkout@v4
@@ -60,10 +61,23 @@ jobs:
         run: |
           APP="build/Build/Products/Release-iphoneos/App.app"
           test -d "$APP" || { echo "App.app introuvable"; exit 1; }
+          test -f "$APP/App" || { echo "binaire compile absent"; exit 1; }
           mkdir -p Payload
           cp -R "$APP" Payload/
           zip -qry FonteEtMacros-non-signe.ipa Payload
           ls -lh FonteEtMacros-non-signe.ipa
+
+      # Une release donne un lien de telechargement direct, sans compte GitHub,
+      # contrairement a un artefact qui exige d'etre connecte.
+      - name: Publier en release telechargeable
+        working-directory: ios/App
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "ipa-${{ github.run_number }}" \
+            FonteEtMacros-non-signe.ipa \
+            --title "IPA ${{ github.run_number }}" \
+            --notes "IPA non signe, a installer avec Sideloadly ou AltStore. Expire au bout de 7 jours avec un identifiant Apple gratuit."
 
       - uses: actions/upload-artifact@v4
         with:
