@@ -12,6 +12,7 @@ on:
   workflow_dispatch:        # lancement a la main depuis l'onglet Actions
   push:
     branches: ['main']      # et automatiquement a chaque envoi sur la branche principale
+    paths-ignore: ['altstore.json']   # le catalogue est ecrit par la compilation : ne pas boucler
     tags: ['v*']
 
 jobs:
@@ -78,6 +79,28 @@ jobs:
             FonteEtMacros-non-signe.ipa \
             --title "IPA ${{ github.run_number }}" \
             --notes "IPA non signe, a installer avec Sideloadly ou AltStore. Expire au bout de 7 jours avec un identifiant Apple gratuit."
+
+      # Le catalogue est genere a partir de l'IPA reellement compile : la version
+      # qu'il annonce ne peut donc plus differer de celle inscrite dans l'app,
+      # ce qui faisait echouer AltStore avec « does not match the version ».
+      - name: Mettre le catalogue a jour depuis l'IPA
+        run: |
+          cd ios/App
+          rm -rf /tmp/verif && mkdir -p /tmp/verif
+          unzip -o -q FonteEtMacros-non-signe.ipa -d /tmp/verif
+          PLIST=/tmp/verif/Payload/App.app/Info.plist
+          VERSION=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$PLIST")
+          BUILD=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$PLIST")
+          MINOS=$(/usr/libexec/PlistBuddy -c 'Print :MinimumOSVersion' "$PLIST")
+          TAILLE=$(stat -f%z FonteEtMacros-non-signe.ipa)
+          echo "app compilee : version $VERSION build $BUILD, iOS $MINOS, $TAILLE octets"
+          cd "$GITHUB_WORKSPACE"
+          node outils/catalogue.js "$VERSION" "$BUILD" "$MINOS" "$TAILLE" "ipa-${{ github.run_number }}"
+          git config user.name 'github-actions'
+          git config user.email 'github-actions@users.noreply.github.com'
+          git add altstore.json
+          git diff --staged --quiet || git commit -m "Catalogue : version $VERSION (compilation ${{ github.run_number }})"
+          git push
 
       - uses: actions/upload-artifact@v4
         with:
