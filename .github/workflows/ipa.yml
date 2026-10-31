@@ -17,7 +17,7 @@ on:
 
 jobs:
   construire:
-    runs-on: macos-14
+    runs-on: macos-15
     timeout-minutes: 45
     permissions:
       contents: write       # necessaire pour creer la release
