@@ -18,13 +18,21 @@
       "tintColor": "9E4426",
       "category": "lifestyle",
       "screenshotURLs": [],
-      "version": "1.0",
-      "versionDate": "2026-10-31T00:00:00Z",
-      "versionDescription": "Premiere version.",
-      "downloadURL": "https://github.com/Walid95-saw/fonte-macros/releases/download/ipa-3/FonteEtMacros-non-signe.ipa",
-      "size": 5139248,
+      "version": "1.1",
+      "versionDate": "2026-10-31T12:00:00Z",
+      "versionDescription": "Saisie manuelle des mesures de la montre, pour les iPhone ou Apple Sante reste inaccessible.",
+      "downloadURL": "https://github.com/Walid95-saw/fonte-macros/releases/download/ipa-6/FonteEtMacros-non-signe.ipa",
+      "size": 5140398,
       "permissions": [],
       "versions": [
+        {
+          "version": "1.1",
+          "date": "2026-10-31T12:00:00Z",
+          "localizedDescription": "Saisie manuelle des mesures de la montre, pour les iPhone ou Apple Sante reste inaccessible.",
+          "downloadURL": "https://github.com/Walid95-saw/fonte-macros/releases/download/ipa-6/FonteEtMacros-non-signe.ipa",
+          "size": 5140398,
+          "minOSVersion": "13.0"
+        },
         {
           "version": "1.0",
           "date": "2026-10-31T00:00:00Z",
