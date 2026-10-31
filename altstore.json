@@ -1,0 +1,42 @@
+{
+  "name": "Fonte & Macros",
+  "identifier": "com.fontemacros.source",
+  "subtitle": "Nutrition et musculation",
+  "description": "Le catalogue personnel de Walid. A ajouter dans AltStore pour installer et renouveler l'application sans passer par l'ordinateur.",
+  "iconURL": "https://raw.githubusercontent.com/Walid95-saw/fonte-macros/main/ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512%402x.png",
+  "tintColor": "#9E4426",
+  "apps": [
+    {
+      "name": "Fonte & Macros",
+      "bundleIdentifier": "com.fontemacros.app",
+      "developerName": "Walid",
+      "subtitle": "Calories, macros, poids et entrainement",
+      "localizedDescription": "Calcul des besoins caloriques et des macros, suivi du poids avec tendance lissee, journal alimentaire sur 204 aliments photographies, repas composes reutilisables, plan de la semaine, programmes de musculation avec mouvements animes, programmes de cardio, et lecture des donnees de sante du telephone.\n\nDisponible en francais et en arabe. Les donnees restent sur l'appareil.",
+      "iconURL": "https://raw.githubusercontent.com/Walid95-saw/fonte-macros/main/ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512%402x.png",
+      "tintColor": "#9E4426",
+      "category": "lifestyle",
+      "screenshotURLs": [],
+      "versions": [
+        {
+          "version": "1.0",
+          "buildVersion": "3",
+          "date": "2026-10-31T00:00:00Z",
+          "localizedDescription": "Premiere version.",
+          "downloadURL": "https://github.com/Walid95-saw/fonte-macros/releases/download/ipa-3/FonteEtMacros-non-signe.ipa",
+          "size": 5139248,
+          "minOSVersion": "13.0"
+        }
+      ],
+      "appPermissions": {
+        "entitlements": [],
+        "privacy": [
+          {
+            "name": "NSHealthShareUsageDescription",
+            "usageDescription": "Lire les calories actives, la distance, les pas, le sommeil et la frequence cardiaque."
+          }
+        ]
+      }
+    }
+  ],
+  "news": []
+}
