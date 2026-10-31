@@ -1002,6 +1002,15 @@ huawei_iphone:["Sur iPhone, rien de tout cela n'est necessaire : Huawei Sante ec
 s_indispo_t:["Aucune source de sante","لا يوجد مصدر صحي"],
 s_indispo:["Ton telephone n'expose aucune application de sante lisible. Sur Android, installe Health Connect depuis le Play Store, puis autorise ta montre a y ecrire.",
            "هاتفك لا يعرض أي تطبيق صحي قابل للقراءة. على أندرويد، ثبّت Health Connect من المتجر ثم اسمح لساعتك بالكتابة فيه."],
+saisie_t:["Saisie manuelle","إدخال يدوي"],
+saisie_x:["Quand l'application ne peut pas lire ta montre, entre ici ce qu'elle affiche. Seules les calories actives sont necessaires ; le reste est facultatif. Une journee saisie a la main compte comme une mesure : la cible dynamique et la comparaison fonctionnent pareil.",
+          "عندما لا يستطيع التطبيق قراءة ساعتك، أدخل هنا ما تعرضه. السعرات النشطة وحدها ضرورية، والباقي اختياري. اليوم المُدخل يدوياً يُحتسب كقياس: الهدف المتغير والمقارنة يعملان بالطريقة نفسها."],
+s_enregistrer:["Enregistrer","حفظ"],
+sa_effacer:["Effacer ce jour","امسح هذا اليوم"],
+sa_enregistre:["enregistre","محفوظ"],
+sa_kcal_requis:["Entre au moins les calories actives.","أدخل السعرات النشطة على الأقل."],
+sommeil_h:["Sommeil (h)","النوم (ساعات)"],
+saisi:["saisi","مُدخل"],
 kcal_actives:["Calories actives","السعرات النشطة"],distance:["Distance","المسافة"],
 sommeil:["Sommeil","النوم"],fc_moy:["Freq. cardiaque moyenne","متوسط نبض القلب"],pas:["Pas","الخطوات"],
 s_rafraichir:["Actualiser","تحديث"],s_maj:["Derniere lecture","آخر قراءة"],
@@ -1022,7 +1031,7 @@ mv_aide:["Clique sur le nom d'un exercice pour voir le mouvement anime et le poi
 const DEFAUT={sexe:"h",age:30,taille:175,poids:75,cible:72,activite:"modere",objectif:"seche",rythme:"modere",protKg:2,lipKg:0.9,nbRepas:4};
 const S={lang:"fr",profil:{...DEFAUT},profilCharge:false,pesees:[],journal:{},persos:[],seances:[],photos:{},
          jour:iso(new Date()),tab:"profil",sel:null,q:"",cat:"",db:null,uid:null,prog:"halfbody",pendPhoto:null,mv:null,
-         sante:{cibleDyn:false,jours:{},source:"",maj:null},santeEtat:"inconnu",
+         sante:{cibleDyn:false,jours:{},source:"",maj:null},santeEtat:"inconnu",saisieJour:null,
          recettes:[],semaine:{},modeAjout:"aliment",nommeRecette:null,jourSem:null,
          sport:"muscu",cardio:"course5k",logCardio:null};
 /* 0 = lundi, pour suivre l'ordre de la semaine ; getDay() compte a partir de dimanche */
@@ -1796,6 +1805,35 @@ function vSemaine(c){
 function hhmm(min){ if(min==null) return "—"; const h=Math.floor(min/60); return `${h} h ${String(r0(min%60)).padStart(2,"0")}` }
 function km(m){ return m==null?"—":(m/1000).toFixed(2) }
 
+/* Saisie a la main de ce que la montre mesure, pour les cas ou l'application
+   ne peut pas la lire : sur iPhone, Apple reserve l'acces a Sante aux comptes
+   developpeur payants, et la signature par identifiant gratuit le perd. */
+function blocSaisie(){
+  const d = S.saisieJour || iso(new Date());
+  const v = S.sante.jours[d] || {};
+  const champ=(id,lib,val,pas,max)=>`<div class="field" style="flex:1 1 120px">
+    <label for="${id}">${lib}</label>
+    <input id="${id}" type="number" min="0" max="${max}" step="${pas}" value="${val!=null?val:""}"></div>`;
+  return `<div class="card">
+    <p class="eyebrow">${t("saisie_t")}</p>
+    <p class="hint" style="margin:8px 0 12px">${t("saisie_x")}</p>
+    <div class="row">
+      <div class="field" style="flex:0 1 160px"><label for="sa_date">${t("date")}</label>
+        <input id="sa_date" type="date" value="${d}" max="${iso(new Date())}"></div>
+      ${champ("sa_kcal", t("kcal_actives"), v.kcal!=null?r0(v.kcal):null, 10, 5000)}
+      ${champ("sa_dist", t("distance")+" (km)", v.dist!=null?r1(v.dist/1000):null, 0.1, 300)}
+      ${champ("sa_sommeil", t("sommeil_h"), v.sommeil!=null?r1(v.sommeil/60):null, 0.25, 24)}
+      ${champ("sa_fc", t("fc_moy"), v.fc!=null?r0(v.fc):null, 1, 220)}
+      ${champ("sa_pas", t("pas"), v.pas!=null?r0(v.pas):null, 100, 100000)}
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn" id="sa_ok">${t("s_enregistrer")}</button>
+      ${v.manuel?`<button class="btn ghost" id="sa_del">${t("sa_effacer")}</button>`:""}
+      <span class="hint" id="sa_msg"></span>
+    </div>
+  </div>`;
+}
+
 function blocComparaison(){
   const lignes=comparaisons(10);
   if(!lignes.length)
@@ -1895,7 +1933,7 @@ function vSante(){
     <p style="margin:8px 0 0">${t("huawei_iphone")}</p>
   </div>`;
 
-  const tuiles = S.santeEtat==="connecte" ? `
+  const tuiles = `
     <div class="grid g3">
       <div class="kpi hero"><div class="k">${h?r0(h.kcal):"—"}<span class="u"> ${t("kcal")}</span></div><div class="n">${t("kcal_actives")}</div></div>
       <div class="kpi"><div class="k">${h?km(h.dist):"—"}<span class="u"> km</span></div><div class="n">${t("distance")}</div></div>
@@ -1909,22 +1947,23 @@ function vSante(){
           <label style="display:flex;gap:9px;align-items:center;margin-top:8px;cursor:pointer">
             <input type="checkbox" id="s_dyn" ${S.sante.cibleDyn?"checked":""}>
             <span style="font-size:14px">${t("s_dyn")}</span></label></div>
-        <button class="btn ghost mini" id="s_maj">${t("s_rafraichir")}</button>
+        ${S.santeEtat==="connecte"?`<button class="btn ghost mini" id="s_maj">${t("s_rafraichir")}</button>`:""}
       </div>
       <p class="hint" style="margin:10px 0 0">${t("s_dyn_x")}</p>
       ${S.sante.maj?`<p class="hint" style="margin:6px 0 0">${t("s_maj")} : ${new Date(S.sante.maj).toLocaleString(S.lang==="ar"?"ar-MA-u-nu-latn":"fr-FR")}${S.sante.source?` · ${esc(S.sante.source)}`:""}</p>`:""}
     </div>
+    ${blocSaisie()}
     ${blocComparaison()}
     <div>
       <h3 style="font-size:17px;margin-bottom:10px">${t("s_7j")}</h3>
       ${derniers.length?`<div class="tw"><table>
         <thead><tr><th>${t("date")}</th><th class="n">${t("kcal_actives")}</th><th class="n">${t("distance")}</th><th class="n">${t("sommeil")}</th><th class="n">${t("fc_moy")}</th><th class="n">${t("pas")}</th></tr></thead>
-        <tbody>${derniers.map(x=>`<tr><td class="n">${frDate(x.d)}</td>
+        <tbody>${derniers.map(x=>`<tr><td class="n">${frDate(x.d)}${x.v.manuel?` <span class="chip a">${t("saisi")}</span>`:""}</td>
           <td class="n">${r0(x.v.kcal||0)}</td><td class="n">${km(x.v.dist)}</td>
           <td class="n">${hhmm(x.v.sommeil)}</td><td class="n">${x.v.fc?r0(x.v.fc):"—"}</td>
           <td class="n">${x.v.pas?r0(x.v.pas):"—"}</td></tr>`).join("")}</tbody></table></div>`
         :`<div class="empty">${t("s_rien")}</div>`}
-    </div>` : "";
+    </div>`;
 
   return `
   <div class="stack">
@@ -2187,6 +2226,7 @@ function majApercuMuscu(){
 document.addEventListener("change",e=>{
   if(e.target.id==="n_cat"||e.target.id==="b_cat"){ S.cat=e.target.value; majListe() }
   if(e.target.id==="s_int") majApercuMuscu();
+  if(e.target.id==="sa_date"){ S.saisieJour=e.target.value; rend() }
   if(e.target.id==="r_nb"){ S.profil.nbRepas=+e.target.value; majProfil(); sauveProfilDiffere() }
   if(e.target.id==="s_dyn"){ S.sante.cibleDyn=e.target.checked; rend();
     ecrire(doc=>doc.set({profil:S.profil,photos:S.photos,sante:S.sante})) }
@@ -2288,6 +2328,30 @@ document.addEventListener("click",async e=>{
     try{ const ok=await p.permissions(); S.santeEtat=ok?"connecte":"a_autoriser"; if(ok) await litSante() }
     catch(err){ console.warn("permissions sante",err) }
     rend(); return;
+  }
+  if(b.id==="sa_ok"){
+    const g=id=>document.getElementById(id);
+    const date=g("sa_date").value||iso(new Date());
+    const nb=id=>{const x=parseFloat(g(id).value);return isFinite(x)?x:null};
+    const kcal=nb("sa_kcal");
+    if(kcal==null){ g("sa_msg").textContent=t("sa_kcal_requis"); return }
+    const dist=nb("sa_dist"), som=nb("sa_sommeil"), fc=nb("sa_fc"), pas=nb("sa_pas");
+    const j={date,kcal,manuel:true};
+    if(dist!=null) j.dist=dist*1000;      /* l'interface est en km, le stockage en metres */
+    if(som!=null)  j.sommeil=som*60;      /* en heures a l'ecran, en minutes au stockage */
+    if(fc!=null)   j.fc=fc;
+    if(pas!=null)  j.pas=pas;
+    S.sante.jours={...S.sante.jours,[date]:j};
+    S.saisieJour=date;
+    rend();
+    const m=document.getElementById("sa_msg"); if(m) m.textContent=frDate(date)+" "+t("sa_enregistre");
+    await ecrire(doc=>doc.set({profil:S.profil,photos:S.photos,sante:S.sante})); return;
+  }
+  if(b.id==="sa_del"){
+    const date=document.getElementById("sa_date").value;
+    const copie={...S.sante.jours}; delete copie[date];
+    S.sante.jours=copie; rend();
+    await ecrire(doc=>doc.set({profil:S.profil,photos:S.photos,sante:S.sante})); return;
   }
   if(b.id==="s_reglages"){
     const p=pontSante(); if(!p||!p.ouvrirReglages) return;
