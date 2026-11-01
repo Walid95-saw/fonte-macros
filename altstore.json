@@ -18,13 +18,22 @@
       "tintColor": "9E4426",
       "category": "lifestyle",
       "screenshotURLs": [],
-      "version": "1.1",
-      "versionDate": "2026-10-31T14:57:01.827Z",
+      "version": "1.2",
+      "versionDate": "2026-11-01T18:09:23.016Z",
       "versionDescription": "Compilation automatique depuis la branche principale.",
-      "downloadURL": "https://github.com/Walid95-saw/fonte-macros/releases/download/ipa-9/FonteEtMacros-non-signe.ipa",
-      "size": 5140305,
+      "downloadURL": "https://github.com/Walid95-saw/fonte-macros/releases/download/ipa-10/FonteEtMacros-non-signe.ipa",
+      "size": 5145176,
       "permissions": [],
       "versions": [
+        {
+          "version": "1.2",
+          "buildVersion": "3",
+          "date": "2026-11-01T18:09:23.016Z",
+          "localizedDescription": "Compilation automatique depuis la branche principale.",
+          "downloadURL": "https://github.com/Walid95-saw/fonte-macros/releases/download/ipa-10/FonteEtMacros-non-signe.ipa",
+          "size": 5145176,
+          "minOSVersion": "13.0"
+        },
         {
           "version": "1.1",
           "buildVersion": "2",
