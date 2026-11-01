@@ -1024,7 +1024,46 @@ cible_dyn_actif:["dont actif mesure","منها نشاط مقاس"],
 voir_mvt:["Voir le mouvement","شاهد الحركة"],fermer:["Fermer","إغلاق"],
 mv_meme:["Meme mouvement :","نفس الحركة:"],
 mv_aide:["Clique sur le nom d'un exercice pour voir le mouvement anime et le point technique a surveiller.",
-         "اضغط على اسم التمرين لمشاهدة الحركة متحركة والنقطة التقنية التي يجب الانتباه لها."]
+         "اضغط على اسم التمرين لمشاهدة الحركة متحركة والنقطة التقنية التي يجب الانتباه لها."],
+
+/* --- saisie exercice par exercice --- */
+fait:["Fait","تم"],
+a_faire:["A faire","للإنجاز"],
+remplis:["exercices remplis","تمارين مُسجّلة"],
+brouillon_garde:["Ta saisie est gardee au fur et a mesure : tu peux fermer l'application et revenir finir la seance plus tard.",
+                 "يُحفظ ما تُدخله تدريجياً: يمكنك إغلاق التطبيق والعودة لإكمال الحصة لاحقاً."],
+reprendre:["Reprendre la saisie","متابعة التسجيل"],
+vider_brouillon:["Vider","تفريغ"],
+dernier_charge:["dernier","الأخير"],
+reprend_dernier:["Reprendre le dernier","استعد الأخير"],
+rien_rempli:["Remplis au moins un exercice avant d'enregistrer.","سجّل تمريناً واحداً على الأقل قبل الحفظ."],
+
+/* --- budget de l'assiette --- */
+budget_prise:["Budget de cette prise","حصة هذه الوجبة"],
+budget_part:["de la journee","من اليوم"],
+budget_ok:["dans l'assiette","داخل الحصة"],
+budget_trop:["au-dela de l'assiette","فوق الحصة"],
+budget_bloque:["Cette prise depasse l'assiette prevue : tu ne peux pas l'enregistrer comme repas en l'etat.",
+               "هذه الوجبة تتجاوز الحصة المقررة: لا يمكن حفظها كوجبة بهذا الشكل."],
+ajuster:["Ajuster a l'assiette","اضبط على الحصة"],
+ajuster_x:["Les quantites de cette prise sont ramenees au budget, en gardant les memes proportions.",
+           "تُخفّض كميات هذه الوجبة إلى الحصة المقررة مع الحفاظ على نفس النسب."],
+rec_deja:["Deja enregistre","محفوظ سابقاً"],
+
+/* --- mise a l'echelle automatique --- */
+auto_echelle:["Quantites ajustees a ton poids et a tes","الكميات مضبوطة على وزنك وعلى"],
+auto_prises:["prises","وجباتك"],
+echelle_ref:["cree pour","أُنشئت لـ"],
+echelle_auj:["aujourd'hui","اليوم"],
+echelle_egal:["quantites inchangees","الكميات دون تغيير"],
+
+/* --- calories actives retenues --- */
+act_retenu:["Actif retenu","النشاط المُحتسب"],
+act_montre:["montre","الساعة"],
+act_estime:["estime","تقديري"],
+act_moyenne:["moyenne des deux","متوسط الاثنين"],
+act_x:["Quand la montre et l'application donnent deux chiffres, la valeur retenue est la moyenne des deux : aucun des deux n'est plus vrai que l'autre.",
+       "عندما تعطي الساعة والتطبيق رقمين مختلفين، القيمة المُحتسبة هي متوسطهما: لا أحدهما أصدق من الآخر."]
 };
 
 /* ============================ ETAT ============================ */
@@ -1033,7 +1072,10 @@ const S={lang:"fr",profil:{...DEFAUT},profilCharge:false,pesees:[],journal:{},pe
          jour:iso(new Date()),tab:"profil",sel:null,q:"",cat:"",db:null,uid:null,prog:"halfbody",pendPhoto:null,mv:null,
          sante:{cibleDyn:false,jours:{},source:"",maj:null},santeEtat:"inconnu",saisieJour:null,
          recettes:[],semaine:{},modeAjout:"aliment",nommeRecette:null,jourSem:null,
-         sport:"muscu",cardio:"course5k",logCardio:null};
+         sport:"muscu",cardio:"course5k",logCardio:null,
+         /* log : quelle seance est ouverte en saisie ; brouillons : ce qui y est deja rempli,
+            garde d'un rendu a l'autre et d'une ouverture de l'application a la suivante. */
+         log:null,brouillons:{}};
 /* 0 = lundi, pour suivre l'ordre de la semaine ; getDay() compte a partir de dimanche */
 const JOURS_SEM=[["Lundi","الاثنين"],["Mardi","الثلاثاء"],["Mercredi","الأربعاء"],["Jeudi","الخميس"],
                  ["Vendredi","الجمعة"],["Samedi","السبت"],["Dimanche","الأحد"]];
@@ -1078,34 +1120,78 @@ function totauxJour(){
   return e.reduce((o,x)=>{const q=x.qte/100;
     o.kcal+=x.kcal*q;o.p+=x.p*q;o.g+=x.g*q;o.l+=x.l*q;return o},{kcal:0,p:0,g:0,l:0});
 }
+/* ---- budget d'une prise ---- */
+/* La part de la journee qui revient a cette prise, telle que la fixe l'assiette
+   du profil. Une prise qui n'est plus au plan n'a plus de budget : on renvoie null
+   plutot que d'en inventer un. */
+function partPrise(ri){ const e=plan().find(([i])=>i===ri); return e?e[1]:null }
+function budgetRepas(ri,c){
+  const part=partPrise(ri); if(part==null) return null;
+  const k=c||calculs(S.profil);
+  return {part, kcal:r0(k.kcal*part), p:r0(k.prot*part), g:r0(k.glu*part), l:r0(k.lip*part)};
+}
+/* Tolerance avant de parler de depassement : 2 %, pour ne pas bloquer sur un arrondi. */
+const MARGE=1.02;
+
 /* ---- repas composes ---- */
 /* Une recette garde le nom de ses aliments et leur quantite, pas leurs calories :
    si tu corriges un aliment, toutes les recettes qui l'utilisent suivent. */
-function totauxRecette(r){
+function totauxRecette(r,facteur){
+  const f=facteur||1;
   return (r.items||[]).reduce((t,it)=>{
     const a=aliments().find(x=>x[0]===it.nom);
     if(!a) return t;
-    const q=it.qte/100;
+    const q=it.qte*f/100;
     t.kcal+=a[2]*q; t.p+=a[3]*q; t.g+=a[4]*q; t.l+=a[5]*q; return t;
   },{kcal:0,p:0,g:0,l:0});
 }
 function recetteParId(id){ return S.recettes.find(r=>r.id===id) }
 function nouvelId(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,5) }
 
+/* Une recette est creee pour un budget precis : celui de la prise, au poids et au
+   nombre de prises du moment. Quand le poids change, ou le nombre de prises, ce
+   budget change aussi — alors on remet les quantites a l'echelle du nouveau budget
+   au lieu de resservir l'ancienne portion. Les recettes d'avant cette version
+   n'ont pas de reference : elles restent telles quelles. */
+function facteurRecette(r,ri,c){
+  const ref=r&&r.base&&r.base.kcal;
+  if(!ref) return 1;
+  const b=budgetRepas(ri==null?r.base.ri:ri,c);
+  if(!b||!b.kcal) return 1;
+  return Math.min(4,Math.max(.25,b.kcal/ref));
+}
+
+/* Deux prises sont le meme repas si elles portent les memes aliments aux memes
+   quantites — ou si elles viennent toutes du meme repas compose. Sert a ne plus
+   proposer d'enregistrer ce qui l'est deja. */
+function cleItems(items){ return (items||[]).map(x=>x.nom+"@"+r0(x.qte)).sort().join("|") }
+function recetteEquivalente(items){
+  if(!items||!items.length) return null;
+  const noms=[...new Set(items.map(x=>x.rec).filter(Boolean))];
+  if(noms.length===1 && items.every(x=>x.rec===noms[0])){
+    const r=S.recettes.find(x=>x.nom===noms[0]); if(r) return r;
+  }
+  const k=cleItems(items); if(!k) return null;
+  return S.recettes.find(r=>cleItems(r.items)===k)||null;
+}
+
 /* Ajoute les aliments d'une recette au journal d'une date, dans une prise donnee.
-   Les lignes restent independantes : tu peux en retirer ou en corriger une seule. */
+   Les quantites passent par la mise a l'echelle automatique, puis par le nombre
+   de portions demande. Les lignes restent independantes : tu peux en retirer ou
+   en corriger une seule. */
 function versJournal(recette,date,ri,facteur){
   const j=S.journal[date]||{date,v:2,entrees:[]};
+  const f=(facteur||1)*facteurRecette(recette,ri);
   const ajouts=[];
   for(const it of recette.items||[]){
     const a=aliments().find(x=>x[0]===it.nom);
     if(!a) continue;
-    ajouts.push({id:nouvelId(),nom:a[0],ri,qte:r1(it.qte*(facteur||1)),
+    ajouts.push({id:nouvelId(),nom:a[0],ri,qte:r1(it.qte*f),
       kcal:a[2],p:a[3],g:a[4],l:a[5],rec:recette.nom});
   }
   j.entrees=(j.entrees||[]).concat(ajouts);
   S.journal[date]=j;
-  return {doc:j,n:ajouts.length};
+  return {doc:j,n:ajouts.length,facteur:f};
 }
 
 /* ---- plan de la semaine ---- */
@@ -1113,7 +1199,7 @@ function planDuJour(js){ return S.semaine[js]||[] }
 function totauxJourPlan(js){
   return planDuJour(js).reduce((t,e)=>{
     const r=recetteParId(e.rid); if(!r) return t;
-    const x=totauxRecette(r);
+    const x=totauxRecette(r,facteurRecette(r,e.ri));
     t.kcal+=x.kcal; t.p+=x.p; t.g+=x.g; t.l+=x.l; return t;
   },{kcal:0,p:0,g:0,l:0});
 }
@@ -1167,7 +1253,7 @@ function sauveLocal(){
   try{ localStorage.setItem(CLE_LOCALE, JSON.stringify({
     v:2, profil:S.profil, photos:S.photos, pesees:S.pesees,
     journal:S.journal, persos:S.persos, seances:S.seances, sante:S.sante,
-    recettes:S.recettes, semaine:S.semaine })) }
+    recettes:S.recettes, semaine:S.semaine, brouillons:S.brouillons })) }
   catch(_){ /* navigation privee ou stockage plein : on continue sans */ }
 }
 function chargeLocal(){
@@ -1178,6 +1264,7 @@ function chargeLocal(){
   S.photos=d.photos||{}; S.pesees=d.pesees||[]; S.journal=d.journal||{};
   S.persos=d.persos||[]; S.seances=d.seances||[]; S.sante=d.sante||S.sante;
   S.recettes=d.recettes||[]; S.semaine=d.semaine||{};
+  S.brouillons=d.brouillons||{};
   return true;
 }
 async function connecte(){
@@ -1318,13 +1405,36 @@ function comparaisons(n){
     .map(comparaisonJour).filter(Boolean);
 }
 
-/* Cible dynamique : socle au repos + depense active reellement mesuree.
+/* ---- calories actives retenues ----
+   La montre donne un total actif pour la journee ; l'application, elle, n'estime
+   que l'entrainement. Quand les deux chiffres existent, on retient leur moyenne :
+   aucun n'est plus vrai que l'autre.
+   Un cas se traite plus finement : si la montre a enregistre ses propres seances,
+   on sait quelle part de son total vient de l'entrainement, et on remplace cette
+   part-la par la moyenne, sans toucher au reste de la journee. */
+function kcalActives(date){
+  const h=santeDuJour(date);
+  if(!h || h.kcal==null) return null;
+  const montre=h.kcal;
+  const cmp=comparaisonJour(date);
+  if(!cmp) return {valeur:r0(montre),montre:r0(montre),estime:null,moyenne:false};
+  if(cmp.mesure!=null){
+    const v=montre-cmp.mesure+cmp.retenu;
+    return {valeur:r0(Math.max(0,v)),montre:r0(montre),estime:cmp.estime,
+            moyenne:true,seances:true};
+  }
+  return {valeur:r0((montre+cmp.estime)/2),montre:r0(montre),estime:cmp.estime,
+          moyenne:true,seances:false};
+}
+
+/* Cible dynamique : socle au repos + depense active retenue.
    Le facteur d'activite du profil est alors ignore, sinon l'effort compterait deux fois. */
 function cibleDuJour(c,date){
-  const h=santeDuJour(date);
-  if(!S.sante.cibleDyn || !h || !h.kcal) return {kcal:c.kcal,dyn:false};
+  const a=kcalActives(date);
+  if(!S.sante.cibleDyn || !a || !a.valeur) return {kcal:c.kcal,dyn:false};
   const socle=calculs({...S.profil,activite:"sedentaire"}).tdee;
-  return {kcal:r0((socle+h.kcal)*(1+c.adj)), dyn:true, actif:r0(h.kcal)};
+  return {kcal:r0((socle+a.valeur)*(1+c.adj)), dyn:true, actif:a.valeur,
+          montre:a.montre, estime:a.estime, moyenne:a.moyenne};
 }
 
 function rend(){
@@ -1556,7 +1666,7 @@ function vNutrition(c){
       <div class="card">
         <div class="row" style="justify-content:space-between;align-items:baseline">
           <div><div class="num" style="font-size:34px;font-weight:600;color:${reste<0?"var(--bad)":"var(--accent)"}">${r0(tot.kcal)}</div>
-               <div class="hint">${t("sur")} ${cible} ${t("kcal")}${cj.dyn?` · ${cj.actif} ${t("cible_dyn_actif")}`:""}</div></div>
+               <div class="hint">${t("sur")} ${cible} ${t("kcal")}${cj.dyn?` · ${cj.actif} ${t("cible_dyn_actif")}${cj.moyenne?` <span style="opacity:.75">(${t("act_montre")} ${cj.montre} · ${t("act_estime")} ${cj.estime})</span>`:""}`:""}</div></div>
           <div style="text-align:end"><div class="num" style="font-size:20px;font-weight:600">${reste>=0?r0(reste):r0(-reste)}</div>
                <div class="hint">${reste>=0?t("restantes"):t("au_dela")}</div></div>
         </div>
@@ -1596,9 +1706,9 @@ function vNutrition(c){
         <button class="btn" id="n_add">${t("ajouter")}</button>
       </div>
       <p class="hint" id="n_apercu" style="margin:8px 0 0">${apercu(a,100)}</p>`:""}
-      ` : blocRecettes()}
+      ` : blocRecettes(c)}
     </div>
-    ${blocRepas(e)}
+    ${blocRepas(e,c)}
   </div>`;
 }
 function apercu(a,q){
@@ -1614,12 +1724,15 @@ function blocHits(liste,a){
      </button>`).join("");
 }
 /* Liste des repas composes, avec leur contenu et leurs totaux calcules a la volee. */
-function blocRecettes(){
+function blocRecettes(c){
   if(!S.recettes.length)
     return `<div class="empty" style="margin-top:12px"><strong>${t("rec_vide_t")}</strong>${t("rec_vide")}</div>`;
   return `<div style="margin-top:12px" class="stack">
     ${S.recettes.map(r=>{
-      const x=totauxRecette(r), n=(r.items||[]).length;
+      /* Les quantites affichees sont celles d'aujourd'hui : mises a l'echelle du
+         budget actuel de la prise pour laquelle le repas a ete cree. */
+      const ri=r.base?r.base.ri:null, f=facteurRecette(r,ri,c), ecart=Math.abs(f-1)>.01;
+      const x=totauxRecette(r,f), n=(r.items||[]).length;
       return `<div class="card" style="padding:12px">
         <div class="row" style="justify-content:space-between;align-items:flex-start">
           <div style="min-width:0">
@@ -1631,8 +1744,12 @@ function blocRecettes(){
         </div>
         <div class="hint" style="margin:8px 0">${(r.items||[]).map(it=>{
             const a=aliments().find(y=>y[0]===it.nom);
-            return `${esc(a?nomDe(a):it.nom)} <span class="num">${r1(it.qte)}</span> ${t("g")}`;
+            return `${esc(a?nomDe(a):it.nom)} <span class="num">${r1(it.qte*f)}</span> ${t("g")}`;
           }).join(" · ")}</div>
+        ${ecart?`<div class="hint" style="color:var(--steel);margin:-2px 0 8px">
+          ${t("auto_echelle")} ${S.profil.nbRepas} ${t("auto_prises")} · <span class="num">&times;${r1(f)}</span>${
+            r.base?` — ${t("echelle_ref")} ${r1(r.base.poids)} ${t("kg")} / ${r.base.nbRepas} ${t("auto_prises")}`:""}
+        </div>`:""}
         <div class="row">
           <div class="field" style="flex:0 1 110px"><label for="rq_${r.id}">${t("rec_portion")}</label>
             <input id="rq_${r.id}" type="number" min="0.25" max="5" step="0.25" value="1"></div>
@@ -1645,24 +1762,48 @@ function blocRecettes(){
   </div>`;
 }
 
-function blocRepas(e){
+function blocRepas(e,c){
   if(!e.length) return `<div class="empty"><strong>${t("jour_vide_t")}</strong>${t("jour_vide")}</div>`;
   /* on affiche toute prise qui porte quelque chose, meme si elle n'est plus au plan */
   return REPAS.map((r,ri)=>{
     const items=e.filter(x=>x.ri===ri);
     if(!items.length) return "";
-    const sk=items.reduce((s,x)=>s+x.kcal*x.qte/100,0);
+    const som=items.reduce((o,x)=>{const q=x.qte/100;
+      o.kcal+=x.kcal*q;o.p+=x.p*q;o.g+=x.g*q;o.l+=x.l*q;return o},{kcal:0,p:0,g:0,l:0});
+    /* Une prise hors plan n'a pas de budget : rien a comparer, rien a bloquer. */
+    const b=budgetRepas(ri,c);
+    const trop=!!b && som.kcal>b.kcal*MARGE;
+    const deja=recetteEquivalente(items);
     return `<div class="meal">
     <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:6px">
-      <h4 style="margin:0">${L(r)} · <span class="num">${r0(sk)}</span> ${t("kcal")}</h4>
-      <button class="btn ghost mini" data-nommer="${ri}">${t("rec_enregistrer")}</button>
+      <h4 style="margin:0">${L(r)} · <span class="num">${r0(som.kcal)}</span> ${t("kcal")}</h4>
+      ${deja
+        ? `<span class="chip" style="opacity:.75">&check; ${t("rec_deja")} — ${esc(deja.nom)}</span>`
+        : `<button class="btn ghost mini" data-nommer="${ri}">${t("rec_enregistrer")}</button>`}
     </div>
-    ${S.nommeRecette===ri?`<div class="row" style="margin-bottom:8px">
+    ${b?`<div class="hint" style="margin:-2px 0 8px">
+      ${t("budget_prise")} <span class="num">${b.kcal}</span> ${t("kcal")}
+      · ${t("prot")} <span class="num">${b.p}</span> · ${t("gluc")} <span class="num">${b.g}</span>
+      · ${t("lip")} <span class="num">${b.l}</span> ${t("g")}
+      <span style="color:${trop?"var(--bad)":"var(--good)"}">— ${trop
+        ? `+${r0(som.kcal-b.kcal)} ${t("kcal")} ${t("budget_trop")}`
+        : t("budget_ok")}</span>
+    </div>`:""}
+    ${S.nommeRecette===ri?(trop
+      ? `<div class="note" style="border-color:var(--bad);margin-bottom:8px">
+          <strong>${t("budget_bloque")}</strong>
+          <div class="row" style="margin-top:10px">
+            <button class="btn" data-ajuster="${ri}">${t("ajuster")}</button>
+            <button class="btn ghost" id="rec_annule">${t("annuler")}</button>
+          </div>
+          <p class="hint" style="margin:8px 0 0">${t("ajuster_x")}</p>
+        </div>`
+      : `<div class="row" style="margin-bottom:8px">
       <div class="field" style="flex:2 1 200px"><label for="rec_nom">${t("rec_nom")}</label>
         <input id="rec_nom" placeholder="${esc(t("rec_exemple"))}"></div>
       <button class="btn" data-creerec="${ri}">${t("creer")}</button>
       <button class="btn ghost" id="rec_annule">${t("annuler")}</button>
-    </div>`:""}
+    </div>`):""}
     <div class="tw"><table><tbody>
     ${items.map(x=>{
       const al=aliments().find(y=>y[0]===x.nom)||[x.nom,"A",x.kcal,x.p,x.g,x.l];
@@ -1784,10 +1925,18 @@ function vSemaine(c){
       <div class="tw" style="border:0"><table><tbody>
         ${plan().map(([ri])=>{
           const dedans=jour.filter(x=>x.ri===ri);
-          return `<tr><td style="white-space:nowrap;vertical-align:top"><b>${L(REPAS[ri])}</b></td>
+          const b=budgetRepas(ri,c);
+          /* Le total d'une case suit le budget de la prise : il bouge avec le poids
+             et avec le nombre de prises, sans que tu aies a retoucher le repas. */
+          const somme=dedans.reduce((s,x)=>{const r=recetteParId(x.rid);
+            return r?s+totauxRecette(r,facteurRecette(r,ri,c)).kcal:s},0);
+          return `<tr><td style="white-space:nowrap;vertical-align:top"><b>${L(REPAS[ri])}</b>
+              ${b?`<div class="hint" style="font-weight:400">${r0(somme)} / ${b.kcal} ${t("kcal")}</div>`:""}</td>
             <td>${dedans.length?dedans.map(x=>{
                 const r=recetteParId(x.rid);
-                return `<span class="chip a" style="margin:0 4px 4px 0;display:inline-block">${esc(r?r.nom:"?")}
+                const k=r?r0(totauxRecette(r,facteurRecette(r,ri,c)).kcal):null;
+                return `<span class="chip a" style="margin:0 4px 4px 0;display:inline-block">${esc(r?r.nom:"?")}${
+                  k!=null?` <span class="num" style="opacity:.75">${k}</span>`:""}
                   <button class="del" style="padding:0 2px;font-size:13px" data-delplan="${js}:${x.rid}:${ri}">&times;</button></span>`;
               }).join(""):`<span class="hint">${t("sem_rien")}</span>`}</td>
             <td style="width:1%;vertical-align:top">
@@ -1865,6 +2014,7 @@ function blocComparaison(){
 
 function vSante(){
   const h=santeDuJour(iso(new Date()));
+  const act=kcalActives(iso(new Date()));
   const derniers=[...Array(7)].map((_,k)=>{
     const d=iso(new Date(Date.now()-k*864e5)); return {d, v:S.sante.jours[d]};
   }).filter(x=>x.v);
@@ -1935,7 +2085,9 @@ function vSante(){
 
   const tuiles = `
     <div class="grid g3">
-      <div class="kpi hero"><div class="k">${h?r0(h.kcal):"—"}<span class="u"> ${t("kcal")}</span></div><div class="n">${t("kcal_actives")}</div></div>
+      <div class="kpi hero"><div class="k">${act?act.valeur:"—"}<span class="u"> ${t("kcal")}</span></div>
+        <div class="n">${act&&act.moyenne?t("act_retenu"):t("kcal_actives")}</div>
+        ${act&&act.moyenne?`<div class="n" style="opacity:.7;margin-top:3px">${t("act_montre")} <span class="num">${act.montre}</span> · ${t("act_estime")} <span class="num">${act.estime}</span> · ${t("act_moyenne")}</div>`:""}</div>
       <div class="kpi"><div class="k">${h?km(h.dist):"—"}<span class="u"> km</span></div><div class="n">${t("distance")}</div></div>
       <div class="kpi"><div class="k">${h?hhmm(h.sommeil):"—"}</div><div class="n">${t("sommeil")}</div></div>
       <div class="kpi"><div class="k">${h&&h.fc?r0(h.fc):"—"}<span class="u"> bpm</span></div><div class="n">${t("fc_moy")}</div></div>
@@ -1950,6 +2102,7 @@ function vSante(){
         ${S.santeEtat==="connecte"?`<button class="btn ghost mini" id="s_maj">${t("s_rafraichir")}</button>`:""}
       </div>
       <p class="hint" style="margin:10px 0 0">${t("s_dyn_x")}</p>
+      <p class="hint" style="margin:6px 0 0">${t("act_x")}</p>
       ${S.sante.maj?`<p class="hint" style="margin:6px 0 0">${t("s_maj")} : ${new Date(S.sante.maj).toLocaleString(S.lang==="ar"?"ar-MA-u-nu-latn":"fr-FR")}${S.sante.source?` · ${esc(S.sante.source)}`:""}</p>`:""}
     </div>
     ${blocSaisie()}
@@ -1959,7 +2112,9 @@ function vSante(){
       ${derniers.length?`<div class="tw"><table>
         <thead><tr><th>${t("date")}</th><th class="n">${t("kcal_actives")}</th><th class="n">${t("distance")}</th><th class="n">${t("sommeil")}</th><th class="n">${t("fc_moy")}</th><th class="n">${t("pas")}</th></tr></thead>
         <tbody>${derniers.map(x=>`<tr><td class="n">${frDate(x.d)}${x.v.manuel?` <span class="chip a">${t("saisi")}</span>`:""}</td>
-          <td class="n">${r0(x.v.kcal||0)}</td><td class="n">${km(x.v.dist)}</td>
+          <td class="n">${(a=>a&&a.moyenne
+            ? `<b>${a.valeur}</b> <span style="color:var(--muted);font-size:12px">(${a.montre}/${a.estime})</span>`
+            : r0(x.v.kcal||0))(kcalActives(x.d))}</td><td class="n">${km(x.v.dist)}</td>
           <td class="n">${hhmm(x.v.sommeil)}</td><td class="n">${x.v.fc?r0(x.v.fc):"—"}</td>
           <td class="n">${x.v.pas?r0(x.v.pas):"—"}</td></tr>`).join("")}</tbody></table></div>`
         :`<div class="empty">${t("s_rien")}</div>`}
@@ -2077,14 +2232,37 @@ function blocSport(){
   </div>`;
 }
 
+/* ---- brouillon de seance ----
+   La saisie n'est plus posee dans le document : elle vit dans l'etat, un brouillon
+   par programme et par seance. Un reaffichage ne l'effface donc plus, et comme
+   l'etat part dans le stockage local, elle survit a la fermeture de l'application.
+   On remplit exercice par exercice, et on enregistre une fois a la fin. */
+function cleBrouillon(ji){ return S.prog+":"+ji }
+function brouillon(ji){
+  const k=cleBrouillon(ji);
+  if(!S.brouillons[k]) S.brouillons[k]={date:iso(new Date()),duree:60,intensite:"moderee",lignes:{}};
+  if(!S.brouillons[k].lignes) S.brouillons[k].lignes={};
+  return S.brouillons[k];
+}
+function nbRemplis(ji){
+  const br=S.brouillons[cleBrouillon(ji)];
+  if(!br) return 0;
+  return Object.values(br.lignes||{}).filter(l=>isFinite(parseFloat(l.charge))).length;
+}
+/* La derniere charge notee pour un exercice, quelle que soit la seance : c'est
+   elle qu'on propose en gris dans le champ, et qu'un appui recopie. */
+function derniereCharge(exo){
+  for(const s of S.seances){
+    const l=(s.lignes||[]).find(x=>x.exo===exo && x.charge);
+    if(l) return {charge:l.charge,reps:l.reps,date:s.date};
+  }
+  return null;
+}
+
 function vEntrainement(){
   if(S.sport==="cardio") return vCardio();
   const pg=PROGS[S.prog];
-  const derniere=exo=>{
-    for(const s of S.seances){ const l=(s.lignes||[]).find(x=>x.exo===exo && x.charge);
-      if(l) return `${r1(l.charge)} × ${l.reps}` }
-    return null;
-  };
+  const derniere=exo=>{ const d=derniereCharge(exo); return d?`${r1(d.charge)} × ${d.reps}`:null };
   return `
   <div class="stack">
     <div>
@@ -2110,13 +2288,14 @@ function vEntrainement(){
             : nomEx(e)}</td><td class="n">${trSerie(s)}</td><td class="n" style="color:var(--muted)">${trSerie(r)}</td>
           <td class="n" style="color:${derniere(e)?"var(--steel)":"var(--muted)"}">${derniere(e)||"—"}</td></tr>`).join("")}
         </tbody></table></div>
-        <button class="btn ghost mini" style="margin-top:10px" data-log="${ji}">${t("noter_seance")}</button>
+        <button class="btn ${nbRemplis(ji)?"":"ghost"} mini" style="margin-top:10px" data-log="${ji}">${
+          nbRemplis(ji)?`${t("reprendre")} — ${nbRemplis(ji)}/${j.ex.length}`:t("noter_seance")}</button>
       </div>`).join("")}
     </div>
 
     <p class="hint">${t("mv_aide")}</p>
     <div id="mvzone">${S.mv?blocMouvement(S.mv):""}</div>
-    <div id="logzone"></div>
+    <div id="logzone">${S.log!=null&&PROGS[S.prog].jours[S.log]?formLog(S.log):""}</div>
 
     <div>
       <h3 style="font-size:17px;margin-bottom:10px">${t("historique")}</h3>
@@ -2153,28 +2332,59 @@ function titreSeance(s){
   return `${L(pg.jours[s.ji].t)} — ${L(pg.t)}`;
 }
 function formLog(ji){
-  const pg=PROGS[S.prog], j=pg.jours[ji];
+  const pg=PROGS[S.prog], j=pg.jours[ji], br=brouillon(ji);
+  const faits=nbRemplis(ji);
   return `<div class="card" style="border-color:var(--accent)">
     <p class="eyebrow">${t("noter")} — ${L(j.t)} · ${L(pg.t)}</p>
     <div class="row" style="margin:10px 0">
       <div class="field" style="flex:0 1 160px"><label for="s_date">${t("date")}</label>
-        <input id="s_date" type="date" value="${iso(new Date())}" max="${iso(new Date())}"></div>
+        <input id="s_date" type="date" value="${br.date}" max="${iso(new Date())}"></div>
       <div class="field" style="flex:0 1 120px"><label for="s_duree">${t("duree")}</label>
-        <input id="s_duree" type="number" min="5" max="300" step="5" value="60"></div>
+        <input id="s_duree" type="number" min="5" max="300" step="5" value="${br.duree}"></div>
       <div class="field" style="flex:1 1 220px"><label for="s_int">${t("intensite")}</label>
         <select id="s_int">${Object.entries(INTENSITES).map(([k,v])=>
-          `<option value="${k}" ${k==="moderee"?"selected":""}>${L(v.t)}</option>`).join("")}</select></div>
+          `<option value="${k}" ${k===br.intensite?"selected":""}>${L(v.t)}</option>`).join("")}</select></div>
     </div>
-    <p class="hint" id="s_apercu" style="margin:0 0 12px">${t("c_estim")} <span class="num">${kcalCardio(INTENSITES.moderee.met,60)}</span> ${t("kcal")} ${t("c_pour")} 60 min ${t("c_a")} ${r1(S.profil.poids)} ${t("kg")}.</p>
-    <div class="tw" style="border:0"><table><thead><tr><th>${t("exercice")}</th><th class="n">${t("charge")}</th><th class="n">${t("reps")}</th></tr></thead><tbody>
-    ${j.ex.map(([e],i)=>`<tr><td>${nomEx(e)}</td>
-      <td class="n"><input class="inp" style="width:92px;text-align:end" type="number" step="0.5" min="0" max="500" data-charge="${i}"></td>
-      <td class="n"><input class="inp" style="width:78px;text-align:end" type="number" step="1" min="0" max="100" data-reps="${i}"></td></tr>`).join("")}
+    <p class="hint" id="s_apercu" style="margin:0 0 12px">${t("c_estim")} <span class="num">${kcalCardio(INTENSITES[br.intensite].met,br.duree)}</span> ${t("kcal")} ${t("c_pour")} ${r0(br.duree)} min ${t("c_a")} ${r1(S.profil.poids)} ${t("kg")}.</p>
+    <div class="tw" style="border:0"><table><thead><tr><th style="width:1%"></th><th>${t("exercice")}</th><th class="n">${t("charge")}</th><th class="n">${t("reps")}</th><th class="n">${t("dernier")}</th></tr></thead><tbody>
+    ${j.ex.map(([e],i)=>{
+      const l=br.lignes[i]||{}, d=derniereCharge(e);
+      const rempli=isFinite(parseFloat(l.charge));
+      return `<tr style="${rempli?"background:var(--accent-soft)":""}">
+        <td style="width:1%"><span id="fl_${i}" style="color:${rempli?"var(--good)":"var(--muted)"}">${rempli?"&check;":"&middot;"}</span></td>
+        <td>${nomEx(e)}</td>
+        <td class="n"><input class="inp" style="width:92px;text-align:end" type="number" step="0.5" min="0" max="500"
+          data-charge="${i}" value="${l.charge!=null?l.charge:""}" placeholder="${d?r1(d.charge):""}"></td>
+        <td class="n"><input class="inp" style="width:78px;text-align:end" type="number" step="1" min="0" max="100"
+          data-reps="${i}" value="${l.reps!=null?l.reps:""}" placeholder="${d?d.reps:""}"></td>
+        <td class="n">${d
+          ? `<button class="exo" data-reprend="${i}" title="${t("reprend_dernier")}"><span class="lp"></span>${r1(d.charge)} × ${d.reps}</button>`
+          : `<span style="color:var(--muted)">—</span>`}</td>
+      </tr>`;
+    }).join("")}
     </tbody></table></div>
-    <div class="row" style="margin-top:12px"><button class="btn" id="s_save" data-ji="${ji}">${t("enreg_seance")}</button>
-      <button class="btn ghost" id="s_cancel">${t("annuler")}</button></div>
-    <p class="hint" style="margin:8px 0 0">${t("noter_h")}</p>
+    <div class="row" style="margin-top:12px;align-items:center">
+      <button class="btn" id="s_save" data-ji="${ji}">${t("enreg_seance")}</button>
+      <button class="btn ghost" id="s_cancel">${t("fermer")}</button>
+      ${faits?`<button class="btn ghost mini" data-videbr="${ji}">${t("vider_brouillon")}</button>`:""}
+      <span class="hint" style="margin-inline-start:auto"><span class="num" id="s_compte">${faits}</span> / ${j.ex.length} ${t("remplis")}</span>
+    </div>
+    <p class="hint" id="s_msg" style="margin:8px 0 0;color:var(--bad)"></p>
+    <p class="hint" style="margin:6px 0 0">${t("noter_h")} ${t("brouillon_garde")}</p>
   </div>`;
+}
+/* Met a jour les seuls reperes qui changent en tapant, pour ne pas reconstruire
+   la vue et perdre le champ en cours de saisie. */
+function majBrouillonUI(ji){
+  const br=S.brouillons[cleBrouillon(ji)]; if(!br) return;
+  for(const [i,l] of Object.entries(br.lignes||{})){
+    const s=document.getElementById("fl_"+i); if(!s) continue;
+    const ok=isFinite(parseFloat(l.charge));
+    s.innerHTML=ok?"&check;":"&middot;";
+    s.style.color=ok?"var(--good)":"var(--muted)";
+    const tr=s.closest("tr"); if(tr) tr.style.background=ok?"var(--accent-soft)":"";
+  }
+  const c=document.getElementById("s_compte"); if(c) c.textContent=nbRemplis(ji);
 }
 
 /* ============================ INTERACTIONS ============================ */
@@ -2190,6 +2400,10 @@ function lireProfil(){
 }
 let tSave=0;
 function sauveProfilDiffere(){ clearTimeout(tSave); tSave=setTimeout(sauveProfil,700) }
+/* Le brouillon de seance n'a pas besoin de partir au serveur a chaque frappe :
+   le stockage de l'appareil suffit, et il suffit a le retrouver au retour. */
+let tBrouillon=0;
+function sauveLocalDiffere(){ clearTimeout(tBrouillon); tBrouillon=setTimeout(sauveLocal,500) }
 function majListe(){
   const h=document.getElementById("hits");
   if(h) h.innerHTML=blocHits(recherche().slice(0,40),S.sel);
@@ -2214,7 +2428,22 @@ document.addEventListener("input",e=>{
     const cd=CARDIOS[S.cardio], m=parseFloat(x.value)||0, ap=document.getElementById("cd_apercu");
     if(ap) ap.innerHTML=`${t("c_estim")} <span class="num">${kcalCardio(cd.met,m)}</span> ${t("kcal")} ${t("c_pour")} ${r0(m)} min ${t("c_a")} ${r1(S.profil.poids)} ${t("kg")}.`;
   }
-  if(x.id==="s_duree") majApercuMuscu();
+  /* --- brouillon de seance : chaque frappe va dans l'etat, pas dans le document --- */
+  if(S.log!=null && x.dataset && (x.dataset.charge!==undefined||x.dataset.reps!==undefined)){
+    const br=brouillon(S.log);
+    const charge=x.dataset.charge!==undefined;
+    const i=charge?x.dataset.charge:x.dataset.reps;
+    if(!br.lignes[i]) br.lignes[i]={};
+    const v=parseFloat(x.value);
+    if(isFinite(v)) br.lignes[i][charge?"charge":"reps"]=v;
+    else delete br.lignes[i][charge?"charge":"reps"];
+    majBrouillonUI(S.log); sauveLocalDiffere(); return;
+  }
+  if(x.id==="s_date"&&S.log!=null){ brouillon(S.log).date=x.value; sauveLocalDiffere(); return }
+  if(x.id==="s_duree"){
+    if(S.log!=null){ brouillon(S.log).duree=parseFloat(x.value)||60; sauveLocalDiffere() }
+    majApercuMuscu();
+  }
 });
 function majApercuMuscu(){
   const d=document.getElementById("s_duree"), i=document.getElementById("s_int"),
@@ -2225,7 +2454,10 @@ function majApercuMuscu(){
 }
 document.addEventListener("change",e=>{
   if(e.target.id==="n_cat"||e.target.id==="b_cat"){ S.cat=e.target.value; majListe() }
-  if(e.target.id==="s_int") majApercuMuscu();
+  if(e.target.id==="s_int"){
+    if(S.log!=null){ brouillon(S.log).intensite=e.target.value; sauveLocalDiffere() }
+    majApercuMuscu();
+  }
   if(e.target.id==="sa_date"){ S.saisieJour=e.target.value; rend() }
   if(e.target.id==="r_nb"){ S.profil.nbRepas=+e.target.value; majProfil(); sauveProfilDiffere() }
   if(e.target.id==="s_dyn"){ S.sante.cibleDyn=e.target.checked; rend();
@@ -2246,8 +2478,10 @@ document.addEventListener("click",async e=>{
 
   if(d.lang){ S.lang=d.lang; try{localStorage.setItem("fm_lang",d.lang)}catch(_){} rend(); return }
   if(d.tab){ S.tab=d.tab; S.sel=null; rend(); return }
-  if(d.prog){ S.prog=d.prog; rend(); return }
-  if(d.sport){ S.sport=d.sport; S.mv=null; S.logCardio=null; rend(); return }
+  /* Changer de programme ferme la saisie en cours : les exercices ne sont plus les
+     memes. Le brouillon lui-meme est garde, il est classe par programme. */
+  if(d.prog){ S.prog=d.prog; S.log=null; rend(); return }
+  if(d.sport){ S.sport=d.sport; S.mv=null; S.logCardio=null; S.log=null; rend(); return }
   if(d.cardio){ S.cardio=d.cardio; S.logCardio=null; rend(); return }
   if(d.mode){ S.modeAjout=d.mode; S.sel=null; rend(); return }
   if(d.jour!==undefined){ S.jourSem=+d.jour; rend(); return }
@@ -2263,10 +2497,31 @@ document.addEventListener("click",async e=>{
     const e=(S.journal[S.jour]||{entrees:[]}).entrees||[];
     const items=e.filter(x=>x.ri===ri).map(x=>({nom:x.nom,qte:x.qte}));
     if(!items.length) return;
+    /* On refuse d'enregistrer une prise qui depasse l'assiette : sinon le repas
+       serait resservi trop copieux chaque fois qu'on le rappelle. */
+    const bud=budgetRepas(ri), som=items.reduce((s,x)=>{
+      const a=aliments().find(y=>y[0]===x.nom); return a?s+a[2]*x.qte/100:s},0);
+    if(bud && som>bud.kcal*MARGE){ rend(); return }
+    /* La reference de creation : c'est elle qui permettra de remettre les
+       quantites a l'echelle quand le poids ou le nombre de prises changera. */
+    const base={kcal:bud?bud.kcal:r0(som),poids:S.profil.poids,nbRepas:S.profil.nbRepas,ri};
     const id=nouvelId();
-    S.recettes=S.recettes.concat([{id,nom,items}]);
+    S.recettes=S.recettes.concat([{id,nom,items,base}]);
     S.nommeRecette=null; rend();
-    await ecrire(doc=>doc.collection("recettes").doc(id).set({nom,items})); return;
+    await ecrire(doc=>doc.collection("recettes").doc(id).set({nom,items,base})); return;
+  }
+  /* Ramene les quantites de la prise au budget de l'assiette, en gardant les
+     proportions entre les aliments. */
+  if(d.ajuster!==undefined){
+    const ri=+d.ajuster, j=S.journal[S.jour]; if(!j) return;
+    const bud=budgetRepas(ri); if(!bud) return;
+    const dedans=(j.entrees||[]).filter(x=>x.ri===ri);
+    const som=dedans.reduce((s,x)=>s+x.kcal*x.qte/100,0);
+    if(!som||som<=bud.kcal) return;
+    const f=bud.kcal/som;
+    j.entrees=(j.entrees||[]).map(x=>x.ri===ri?{...x,qte:r1(x.qte*f)}:x);
+    S.journal[S.jour]=j; S.nommeRecette=ri; rend();
+    await ecrire(doc=>doc.collection("journal").doc(j.date||S.jour).set(j)); return;
   }
   if(d.delrec){
     S.recettes=S.recettes.filter(r=>r.id!==d.delrec);
@@ -2424,25 +2679,39 @@ document.addEventListener("click",async e=>{
   }
 
   if(d.log!==undefined){
+    S.log=+d.log; rend();
     const z=document.getElementById("logzone");
-    z.innerHTML=formLog(+d.log); z.scrollIntoView({behavior:"smooth",block:"center"}); return;
+    if(z) z.scrollIntoView({behavior:"smooth",block:"center"}); return;
   }
-  if(b.id==="s_cancel"){ document.getElementById("logzone").innerHTML=""; return }
+  /* Fermer ne jette rien : le brouillon reste, le bouton de la seance l'annonce. */
+  if(b.id==="s_cancel"){ S.log=null; rend(); return }
+  if(d.videbr!==undefined){
+    delete S.brouillons[cleBrouillon(+d.videbr)]; rend(); sauveLocal(); return;
+  }
+  /* Recopie la derniere charge notee pour cet exercice : c'est le geste de chaque
+     seance, inutile de retaper ce qui n'a pas bouge. */
+  if(d.reprend!==undefined && S.log!=null){
+    const j=PROGS[S.prog].jours[S.log], i=+d.reprend;
+    const dc=derniereCharge(j.ex[i][0]); if(!dc) return;
+    const br=brouillon(S.log);
+    br.lignes[i]={charge:dc.charge,reps:dc.reps};
+    rend(); sauveLocal(); return;
+  }
   if(b.id==="s_save"){
-    const ji=+b.dataset.ji, j=PROGS[S.prog].jours[ji];
-    const date=document.getElementById("s_date").value||iso(new Date());
+    const ji=+b.dataset.ji, j=PROGS[S.prog].jours[ji], br=brouillon(ji);
     const lignes=j.ex.map(([ex],i)=>{
-      const ch=parseFloat(document.querySelector(`[data-charge="${i}"]`).value);
-      const rp=parseFloat(document.querySelector(`[data-reps="${i}"]`).value);
-      return isFinite(ch)?{exo:ex,charge:ch,reps:isFinite(rp)?rp:0}:null;
+      const l=br.lignes[i]||{}, ch=parseFloat(l.charge);
+      return isFinite(ch)?{exo:ex,charge:ch,reps:isFinite(parseFloat(l.reps))?parseFloat(l.reps):0}:null;
     }).filter(Boolean);
-    if(!lignes.length) return;
-    const duree=parseFloat(document.getElementById("s_duree").value)||60;
-    const intensite=document.getElementById("s_int").value;
+    if(!lignes.length){
+      const m=document.getElementById("s_msg"); if(m) m.textContent=t("rien_rempli"); return;
+    }
+    const date=br.date||iso(new Date()), duree=br.duree||60, intensite=br.intensite||"moderee";
     const id=nouvelId();
     const s={date,prog:S.prog,ji,lignes,duree,intensite,
              kcal:kcalCardio(INTENSITES[intensite].met,duree)};
     S.seances=[{id,...s}].concat(S.seances).sort((a,b)=>a.date<b.date?1:-1);
+    delete S.brouillons[cleBrouillon(ji)]; S.log=null;
     rend();
     await ecrire(doc=>doc.collection("seances").doc(id).set(s)); return;
   }
